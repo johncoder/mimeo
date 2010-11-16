@@ -45,8 +45,6 @@
     <Compile Include="Design\Syntax\IFluentSyntax.cs" />
     <Compile Include="Design\Syntax\ITokenRoot.cs" />
     <Compile Include="Design\Syntax\ITokenSyntax.cs" />
-    <Compile Include="Design\Syntax\SimpleToken.cs" />
-    <Compile Include="Design\Syntax\TokenRoot.cs" />
     <Compile Include="Design\Token.cs" />
     <Compile Include="Design\TokenBlockBuilder.cs" />
     <Compile Include="Design\TokenBuilder.cs" />
