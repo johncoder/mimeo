@@ -20,14 +20,12 @@ namespace Mimeo.Design
             Ensure.ArgumentNotNull(replacement, "replacement");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
-            var token = new Token<TModel>
+            _currentToken = new Token<TModel>
             {
                 Resolve = replacement,
                 Identifier = string.Intern(identifier)
             };
-
-            _currentToken = token;
-            Token.AddChild(token);
+            Token.AddChild(_currentToken);
 
             return this;
         }
