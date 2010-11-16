@@ -3,3 +3,4 @@ glob:obj
 glob:.suo
 glob:*.suo
 glob:*.csproj.user
+glob:_ReSharper*

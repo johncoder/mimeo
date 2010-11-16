@@ -50,7 +50,9 @@
     <Compile Include="Design\Token.cs" />
     <Compile Include="Design\TokenBlockBuilder.cs" />
     <Compile Include="Design\TokenBuilder.cs" />
+    <Compile Include="InputParser.cs" />
     <Compile Include="Internal\Ensure.cs" />
+    <Compile Include="Parsing\IParserStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

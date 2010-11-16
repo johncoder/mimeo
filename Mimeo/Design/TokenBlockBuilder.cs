@@ -1,29 +1,44 @@
 ﻿using System;
 using Mimeo.Design.Syntax;
+using Mimeo.Internal;
 
 namespace Mimeo.Design
 {
-    public class TokenBlockBuilder<TModel, TChild> : ITokenBegin<TModel, TChild>, ITokenBlock<TModel, TChild>
+    public class TokenBlockBuilder<TModel, TChild> : IConditionalToken<TModel, TChild>, ITokenBlock<TModel, TChild>
     {
-        private readonly ITokenRoot<TModel> _parent;
+        private readonly IToken _token;
 
-        public TokenBlockBuilder(ITokenRoot<TModel> root)
+        public TokenBlockBuilder(IToken token)
         {
-            _parent = root;
+            _token = token;
         }
 
         public ITokenBlock<TModel, TChild> AsBlock(Action<ITokenRoot<TChild>> context)
         {
+            Ensure.ArgumentNotNull(context, "context");
+
+            var builder = new TokenBuilder<TChild>();
+            context(builder);
+            AsBlock(builder);
+
             return this;
         }
 
         public ITokenBlock<TModel, TChild> AsBlock(ITokenRoot<TChild> context)
         {
+            Ensure.ArgumentNotNull(context, "context");
+            
+            foreach(var token in context.Token.Children)
+                _token.AddChild(token);
+
             return this;
         }
 
         public ITokenBlock<TModel, TChild> EndsWith(string terminator)
         {
+            Ensure.ArgumentNotNullOrEmpty(terminator, "terminator");
+
+            _token.Terminator = terminator;
             return this;
         }
     }

@@ -7,12 +7,12 @@ namespace Mimeo.Design
 {
     public class TokenBuilder<TModel> : ITokenRoot<TModel>, ISimpleToken<TModel>
     {
-        private readonly ICollection<Token<TModel>> _tokens;
+        public IToken Token { get; protected set; }
         private Token<TModel> _currentToken;
 
         public TokenBuilder()
         {
-            _tokens = new List<Token<TModel>>();
+            Token = new Token<TModel>();
         }
 
         public ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier)
@@ -27,9 +27,26 @@ namespace Mimeo.Design
             };
 
             _currentToken = token;
-            _tokens.Add(token);
+            Token.AddChild(token);
 
             return this;
+        }
+
+        public IConditionalToken<TModel, TChild> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Func<TModel, bool> condition)
+        {
+            Ensure.ArgumentNotNull(replacement, "replacement");
+            Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
+            Ensure.ArgumentNotNull(condition, "condition");
+
+            _currentToken = new Token<TModel>
+            {
+                Resolve = p => string.Empty,
+                Identifier = identifier,
+                Condition = condition
+            };
+            Token.Children.Add(_currentToken);
+
+            return new TokenBlockBuilder<TModel, TChild>(_currentToken);
         }
 
         public ITokenBegin<TModel, TChild> Tokenize<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier)
@@ -37,7 +54,14 @@ namespace Mimeo.Design
             Ensure.ArgumentNotNull(children, "children");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
-            return new TokenBlockBuilder<TModel, TChild>(this);
+            _currentToken = new Token<TModel>
+            {
+                Resolve = p => string.Empty,
+                Identifier = identifier
+            };
+            Token.Children.Add(_currentToken);
+
+            return new TokenBlockBuilder<TModel, TChild>(_currentToken);
         }
 
         public ISimpleToken<TModel> Encode(bool shouldEncode)
