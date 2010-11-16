@@ -22,4 +22,9 @@ namespace Mimeo.Design
         string GetValue(TModel model);
         bool CanHandle(TModel model);
     }
+
+    public interface IToken<TModel, TChild> : IToken<TModel>
+    {
+        Func<TModel, IEnumerable<TChild>> Items { get; set; }
+    }
 }

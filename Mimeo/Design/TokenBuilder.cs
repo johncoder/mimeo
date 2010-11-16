@@ -54,10 +54,11 @@ namespace Mimeo.Design
             Ensure.ArgumentNotNull(children, "children");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
-            _currentToken = new Token<TModel>
+            _currentToken = new BlockToken<TModel, TChild>
             {
                 Resolve = p => string.Empty,
-                Identifier = identifier
+                Identifier = identifier,
+                Items = children
             };
             Token.Children.Add(_currentToken);
 
@@ -66,6 +67,9 @@ namespace Mimeo.Design
 
         public ISimpleToken<TModel> Encode(bool shouldEncode)
         {
+            // come back to this to add filters
+            // consider adding filters collection to Token
+            // and during GetValue, run the result through the collection of filters
             return this;
         }
     }

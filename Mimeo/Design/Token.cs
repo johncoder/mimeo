@@ -33,12 +33,12 @@ namespace Mimeo.Design
             Children.Add(token);
         }
 
-        public string GetValue(object obj)
+        public virtual string GetValue(object obj)
         {
             return GetValue((TModel)obj);
         }
 
-        public string GetValue(TModel model)
+        public virtual string GetValue(TModel model)
         {
             if (Resolve == null)
                 throw new NullReferenceException("Resolve delegate not yet set.");

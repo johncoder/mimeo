@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Design\IStencilDesigner.cs" />
+    <Compile Include="Design\BlockToken.cs" />
     <Compile Include="Design\IToken.cs" />
     <Compile Include="Design\Syntax\IFluentSyntax.cs" />
     <Compile Include="Design\Syntax\ITokenRoot.cs" />
