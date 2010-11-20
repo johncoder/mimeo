@@ -1,79 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using Mimeo.Design.Syntax;
-using NUnit.Framework;
+using System.Reflection;
+using System.Text;
 using Mimeo.Design;
+using Mimeo.Design.Syntax;
+using Mimeo.Parsing;
+using NUnit.Framework;
 using Should;
 
 namespace Mimeo.Tests
 {
-	[TestFixture]
-	public class TokenBuilderTest
-	{
+    [TestFixture]
+    public class InputParserTest
+    {
         private ITokenRoot<BlogTemplate> _builder;
+        private string _template;
 
-	    [SetUp]
+        [SetUp]
         public void SetUp()
         {
+            _template = File.ReadAllText(Assembly.GetExecutingAssembly().Location.Replace("Mimeo.Tests.dll", "TestData\\Sample1.txt"));
             _builder = new TokenBuilder<BlogTemplate>();
-        }
-
-        [Test]
-        public void Builder_can_create_a_simple_token_and_two_blocks()
-        {
             _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
             _builder.Tokenize(b => b.Post, @"{Post}", b => b.Post != null)
-                .AsBlock(ctx => {
+                .AsBlock(ctx =>
+                {
                     ctx.Tokenize(b => b.PostTitle, @"{Title}");
                     ctx.Tokenize(b => b.PostDescription, @"{Description}");
                     ctx.Tokenize(b => b.PostBody, @"{PostBody}");
                 }).EndsWith(@"{/Post}");
             _builder.Tokenize(b => b.Posts, @"{Posts}")
-                .AsBlock(postContext => {
+                .AsBlock(postContext =>
+                {
                     postContext.Tokenize(d => d.PostTitle, @"{Post.Title}");
                     postContext.Tokenize(d => d.PostDescription, @"{Post.Description}");
                     postContext.Tokenize(d => d.PostBody, @"{Post.Body}").Encode(false);
                     postContext.Tokenize(d => d.PostedOn.ToShortDateString(), @"{Post.Date}");
                     postContext.Tokenize(d => d.Comments, @"{Comments}")
-                        .AsBlock(commentContext => {
+                        .AsBlock(commentContext =>
+                        {
                             commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
                             commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
                             commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
                         }).EndsWith(@"{/Comments}");
                 }).EndsWith(@"{/Posts}");
-
-            _builder.Token.Children.Count().ShouldEqual(3);
         }
 
         [Test]
-        public void Calling_tokenize_should_add_one_child_token()
+        public void FileReadingTest()
         {
-            _builder.Token.Children.Clear();
-
-            _builder.Tokenize(b => b.PageTitle, @"{PageTitle}");
-
-            _builder.Token.Children.Count().ShouldEqual(1);
+            _template.ShouldNotBeNull();
+            _template.ShouldNotBeEmpty();
+            (_template.Length > 10).ShouldBeTrue();
+            Debug.WriteLine(_template);
         }
 
         [Test]
-        public void Calling_tokenize_asblock_should_add_one_child_token()
+        public void InputParser_should_return_several_tokenmatches()
         {
-            _builder.Token.Children.Clear();
+            var inputParser = new RegexInputParser(_template);
 
-            _builder.Tokenize(b => b.Posts, @"{Posts}").AsBlock(ctx => { }).EndsWith(@"{/Posts}");
+            inputParser.Parse(_builder.Token);
 
-            _builder.Token.Children.Count().ShouldEqual(1);
-        }
-
-        [Test]
-        public void Calling_tokenize_asblock_should_add_one_child_token_and_terminates()
-        {
-            _builder.Token.Children.Clear();
-
-            _builder.Tokenize(b => b.Posts, @"{Posts}").AsBlock(ctx => { }).EndsWith(@"{/Posts}");
-
-            _builder.Token.Children.Count().ShouldEqual(1);
-            _builder.Token.Children.First().Terminator.ShouldNotBeNull();
-            _builder.Token.Children.First().Terminator.ShouldEqual(@"{/Posts}");
+            inputParser.Matches.Any().ShouldBeTrue();
         }
     }
 }

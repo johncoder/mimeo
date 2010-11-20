@@ -48,10 +48,21 @@
     <Compile Include="Design\Token.cs" />
     <Compile Include="Design\TokenBlockBuilder.cs" />
     <Compile Include="Design\TokenBuilder.cs" />
-    <Compile Include="InputParser.cs" />
+    <Compile Include="Parsing\IInputParser.cs" />
+    <Compile Include="Parsing\ManualInputParser.cs" />
+    <Compile Include="Parsing\RegexInputParser.cs" />
     <Compile Include="Internal\Ensure.cs" />
-    <Compile Include="Parsing\IParserStrategy.cs" />
+    <Compile Include="Internal\MatchCollectionExtensions.cs" />
+    <Compile Include="Parsing\TokenMatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Templating\ComplexNegative.cs" />
+    <Compile Include="Templating\ComplexNegativeFactory.cs" />
+    <Compile Include="Templating\IStencil.cs" />
+    <Compile Include="Templating\Negative.cs" />
+    <Compile Include="Templating\Positive.cs" />
+    <Compile Include="Templating\SimpleNegative.cs" />
+    <Compile Include="Templating\Space.cs" />
+    <Compile Include="Templating\Stencil.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
