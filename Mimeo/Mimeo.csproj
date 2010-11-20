@@ -58,7 +58,6 @@
     <Compile Include="Templating\ComplexNegative.cs" />
     <Compile Include="Templating\ComplexNegativeFactory.cs" />
     <Compile Include="Templating\IStencil.cs" />
-    <Compile Include="Templating\Negative.cs" />
     <Compile Include="Templating\Positive.cs" />
     <Compile Include="Templating\SimpleNegative.cs" />
     <Compile Include="Templating\Space.cs" />

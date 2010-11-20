@@ -1,18 +1,14 @@
-﻿using System;
-using System.Text;
-using System.Linq.Expressions;
+﻿using System.Text;
 using Mimeo.Design;
 
 namespace Mimeo.Templating
 {
-	public class SimpleNegative<TModel> : Negative<TModel>
+	public class SimpleNegative : Space
 	{
-		//private readonly Func<TModel, object> _getContents;
-	    private IToken _token;
+	    private readonly IToken _token;
 
-		public override void GetContents(TModel model, StringBuilder stringBuilder)
+		public override void GetContents(object model, StringBuilder stringBuilder)
 		{
-			//stringBuilder.Append(_getContents(model).ToString());
 		    var token = _token;
 
 		    do

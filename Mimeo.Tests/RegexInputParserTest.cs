@@ -14,7 +14,7 @@ using Should;
 namespace Mimeo.Tests
 {
     [TestFixture]
-    public class InputParserTest
+    public class RegexInputParserTest
     {
         private ITokenRoot<BlogTemplate> _builder;
         private string _template;
@@ -59,7 +59,7 @@ namespace Mimeo.Tests
         }
 
         [Test]
-        public void InputParser_should_return_several_tokenmatches()
+        public void RegexInputParser_should_return_several_tokenmatches()
         {
             var inputParser = new RegexInputParser(_template);
 

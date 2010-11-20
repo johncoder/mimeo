@@ -56,7 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FakeDomain.cs" />
-    <Compile Include="InputParserTest.cs" />
+    <Compile Include="ManualInputParserTest.cs" />
+    <Compile Include="RegexInputParserTest.cs" />
     <Compile Include="TokenBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

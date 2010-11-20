@@ -1,39 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Linq.Expressions;
+using Mimeo.Design;
+using Mimeo.Internal;
 
 namespace Mimeo.Templating
 {
-	public class ComplexNegative<TModel, TChild> : Negative<TModel>
-	{
-		Func<TModel, object> _getProperty;
-		IEnumerable<Space> _body;
+    public class ComplexNegative<TModel, TChild> : Space
+    {
+        private readonly ICollection<Space> _spaces;
+        private readonly IToken<TModel, TChild> _token;
 
-		public IEnumerable<Space> Spaces { get { return _body; } }
+        public ComplexNegative(IToken<TModel, TChild> token, IEnumerable<Space> spaces)
+        {
+            _token = token;
+            _spaces = spaces.ToList();
+        }
 
-		public ComplexNegative(Expression<Func<TModel, object>> property, IEnumerable<Space> body)
-		{
-			_body = body;
-			_getProperty = property.Compile();
-		}
+        public override void GetContents(object model, StringBuilder stringBuilder)
+        {
+            Ensure.ArgumentNotNull(model, "model");
 
-		public override void GetContents(TModel model, StringBuilder stringBuilder)
-		{
-			var result = _getProperty(model);
-
-			GetContents(stringBuilder, result as IEnumerable<object>);
-		}
-
-		private void GetContents(StringBuilder stringBuilder, IEnumerable<object> items)
-		{
-			foreach (var item in items)
-			{
-				foreach (var space in _body)
-				{
-					space.GetContents(item, stringBuilder);
-				}
-			}
-		}
-	}
+            foreach (var item in _token.Items((TModel)model))
+            {
+                foreach (var space in _spaces)
+                {
+                    space.GetContents(item, stringBuilder);
+                }
+            }
+        }
+    }
 }
