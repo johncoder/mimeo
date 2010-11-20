@@ -4,3 +4,4 @@ glob:.suo
 glob:*.suo
 glob:*.csproj.user
 glob:_ReSharper*
+glob:*.ReSharper.user
