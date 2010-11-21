@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Mimeo.Design;
 
 namespace Mimeo.Templating
@@ -7,7 +8,12 @@ namespace Mimeo.Templating
 	{
 	    private readonly IToken _token;
 
-		public override void GetContents(object model, StringBuilder stringBuilder)
+        public SimpleNegative(IToken token)
+        {
+            _token = token;
+        }
+        
+        public override void GetContents(object model, StringBuilder stringBuilder)
 		{
 		    var token = _token;
 
@@ -22,9 +28,14 @@ namespace Mimeo.Templating
 		        stringBuilder.Append(token.GetValue(model));
 		}
 
-	    public SimpleNegative(IToken token)
-	    {
-	        _token = token;
-	    }
-	}
+        public override bool CanHandle(object model)
+        {
+            return _token.CanHandle(model);
+        }
+
+        public override bool ShouldHandle(object model)
+        {
+            return _token.ShouldHandle(model);
+        }
+    }
 }

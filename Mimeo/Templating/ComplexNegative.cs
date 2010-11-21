@@ -21,13 +21,35 @@ namespace Mimeo.Templating
         {
             Ensure.ArgumentNotNull(model, "model");
 
+            if (!CanHandle(model))
+                return;
+
             foreach (var item in _token.Items((TModel)model))
             {
                 foreach (var space in _spaces)
                 {
-                    space.GetContents(item, stringBuilder);
+                    if (space.CanHandle(item))
+                    {
+                        if (space.ShouldHandle(item))
+                            space.GetContents(item, stringBuilder);
+                    }
+                    else
+                    {
+                        if (space.CanHandle(model) && space.ShouldHandle(model))
+                            space.GetContents(model, stringBuilder);
+                    }
                 }
             }
+        }
+
+        public override bool CanHandle(object model)
+        {
+            return _token.CanHandle(model);
+        }
+
+        public override bool ShouldHandle(object model)
+        {
+            return _token.ShouldHandle(model);
         }
     }
 }

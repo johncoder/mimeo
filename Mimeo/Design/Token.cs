@@ -48,10 +48,15 @@ namespace Mimeo.Design
 
 	    public bool CanHandle(object obj)
 	    {
-	        return CanHandle((TModel)obj);
+	        return obj is TModel;
 	    }
 
-        public bool CanHandle(TModel model)
+        public bool ShouldHandle(object obj)
+        {
+            return ShouldHandle((TModel)obj);
+        }
+
+        public bool ShouldHandle(TModel model)
         {
             if (Condition == null)
                 return true;

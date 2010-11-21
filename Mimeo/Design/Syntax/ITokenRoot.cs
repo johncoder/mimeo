@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Mimeo.Design.Syntax
 {
+    // Idea:  Include an Ignore token.  BlockToken... _builder.Ignore("{Ignore}").To("{/Ignore}");
+    // Idea:  Add a Condition overload for each token type Func<TModel, bool> condition
+
     public interface ITokenRoot<TModel> : ITokenSyntax
     {
         IToken Token { get; }

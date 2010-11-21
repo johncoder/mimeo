@@ -15,5 +15,10 @@ namespace Mimeo.Templating
         {
             stringBuilder.Append(_value);
         }
+
+        public override bool CanHandle(object model)
+        {
+            return true;
+        }
     }
 }

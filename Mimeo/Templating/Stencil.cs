@@ -6,15 +6,15 @@ using System.Reflection;
 
 namespace Mimeo.Templating
 {
-	public class Stencil<TModel> : IStencil<TModel>
+	public class Stencil<TModel> //: IStencil<TModel>
 	{
-		private readonly List<Space> _spaces;
-		private readonly ComplexNegativeFactory _complexNegativeFactory;
+        //private readonly List<Space> _spaces;
+        //private readonly ComplexNegativeFactory _complexNegativeFactory;
 		
-		public IEnumerable<Space> Spaces
-		{
-			get { return _spaces; }
-		}
+        //public IEnumerable<Space> Spaces
+        //{
+        //    get { return _spaces; }
+        //}
 
         //public Stencil(string template, IEnumerable<Range> ranges)
         //{

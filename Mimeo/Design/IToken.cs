@@ -9,6 +9,7 @@ namespace Mimeo.Design
         string Terminator { get; set; }
         string GetValue(object obj);
         bool CanHandle(object obj);
+        bool ShouldHandle(object obj);
         ICollection<IToken> Children { get; set; }
         IToken Parent { get; set; }
         void SetParent(IToken token);
@@ -20,7 +21,7 @@ namespace Mimeo.Design
         Func<TModel, string> Resolve { get; set; }
         Func<TModel, bool> Condition { get; set; }
         string GetValue(TModel model);
-        bool CanHandle(TModel model);
+        //bool CanHandle(TModel model);
     }
 
     public interface IToken<TModel, TChild> : IToken<TModel>
