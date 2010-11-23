@@ -20,5 +20,10 @@ namespace Mimeo.Templating
         {
             return true;
         }
+
+        public override bool ShouldHandle(object model)
+        {
+            return true;
+        }
     }
 }
