@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using Mimeo.Design;
 using Mimeo.Internal;
 using Mimeo.Templating;
@@ -12,39 +9,81 @@ namespace Mimeo.Parsing
     public class ManualInputParser : IInputParser
     {
         private readonly string _template;
-        private ICollection<NewTokenMatch> _matches;
-        public ICollection<TokenMatch> Matches { get; set; }
-        private ICollection<Space> _spaces;
+        private int _currentPosition;
+        private IToken _currentToken;
 
         public ManualInputParser(string template)
         {
             _template = template;
-            Matches = new List<TokenMatch>();
-            _matches = new List<NewTokenMatch>();
-            _spaces = new List<Space>();
         }
 
-        void IInputParser.Parse(IToken token)
+        IStencil IInputParser.Parse(IToken token)
         {
-            Parse(token);
+            return Parse(token);
         }
 
-        public void Parse(IToken token, int start = 0)
+        public IStencil Parse(IToken token, int start = 0)
         {
-            int plainText = start;
+            var stencil = new Stencil();
+            var stringBuilder = new StringBuilder();
 
             for (int i = start; i < _template.Length; i++)
             {
-                char c = _template[i];
+                var result = ProcessChildTokens(token, stencil, stringBuilder);
 
-                if (!string.IsNullOrEmpty(token.Identifier))
+                switch(result)
                 {
-                    if (CurrentIsToken(i, token.Identifier))
-                    {
-                        plainText = i;
-                    }
+                    case ProcessTokenResult.Simple:
+                        break;
+                    case ProcessTokenResult.Complex:
+                        break;
+                    case ProcessTokenResult.NotAToken:
+                        continue;
                 }
             }
+
+            if (stringBuilder.Length > 0)
+                stencil.Add(new Positive(stringBuilder.ToString()));
+
+            return stencil;
+        }
+
+        private ProcessTokenResult ProcessChildTokens(IToken token, Stencil stencil, StringBuilder stringBuilder)
+        {
+            char c = _template[_currentPosition];
+
+            foreach (var child in token.Children)
+            {
+                if (!string.IsNullOrEmpty(child.Identifier))
+                {
+                    if (CurrentIsToken(_currentPosition, child.Identifier))
+                    {
+                        stencil.Add(new Positive(stringBuilder.ToString()));
+                        stringBuilder.Clear();
+
+                        _currentToken = child;
+                        _currentPosition += child.Identifier.Length - 1;
+
+                        if (string.IsNullOrEmpty(child.Terminator))
+                        {
+                            return ProcessTokenResult.Simple;
+                        }
+                        
+                        return ProcessTokenResult.Complex;
+                    }
+
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return ProcessTokenResult.NotAToken;
+        }
+
+        enum ProcessTokenResult
+        {
+            Simple,
+            Complex,
+            NotAToken
         }
 
         public bool CurrentIsToken(int start, string identifier)

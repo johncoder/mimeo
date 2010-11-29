@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Mimeo.Templating
 {
-	public interface IStencil<TModel>
+	public interface IStencil : IList<Space>
 	{
-		IEnumerable<Space> Spaces { get; }
+
+	    void GetContents(object model, StringBuilder stringBuilder);
 	}
 }

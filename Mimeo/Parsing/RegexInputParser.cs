@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Mimeo.Design;
 using System.Text.RegularExpressions;
 using Mimeo.Internal;
+using Mimeo.Templating;
 
 namespace Mimeo.Parsing
 {
@@ -15,11 +16,12 @@ namespace Mimeo.Parsing
         public RegexInputParser(string template)
         {
             Ensure.ArgumentNotNullOrEmpty(template, "template");
+
             _template = template;
             Matches = new List<TokenMatch>();
         }
 
-        public void Parse(IToken token)
+        public IStencil Parse(IToken token)
         {
             if (!string.IsNullOrEmpty(token.Identifier))
                 AddMatches(token, t => t.Identifier);
@@ -36,6 +38,8 @@ namespace Mimeo.Parsing
                 //    foreach(var grandchild in child.Children)
                 //        Parse(grandchild);
             }
+
+            return new Stencil();
         }
 
         private void AddMatches(IToken token, Func<IToken, string> pattern)

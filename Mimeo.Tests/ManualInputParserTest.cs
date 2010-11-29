@@ -19,6 +19,7 @@ namespace Mimeo.Tests
         public void SetUp()
         {
             _template = File.ReadAllText(Assembly.GetExecutingAssembly().Location.Replace("Mimeo.Tests.dll", "TestData\\Sample1.txt"));
+
             _builder = new TokenBuilder<BlogTemplate>();
             _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
             _builder.Tokenize(b => b.Post, @"{Post}", b => b.Post != null)
@@ -55,13 +56,31 @@ namespace Mimeo.Tests
         }
 
         [Test]
+        public void ManualInputParser_Parse_should_return_single_simple_negative_space()
+        {
+            var inputParser = new ManualInputParser("{PageTitle}");
+
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(1);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_should_return_single_positive_space()
+        {
+            var inputParser = new ManualInputParser("asdf");
+            var stencil = inputParser.Parse(_builder.Token);
+            stencil.Count().ShouldEqual(1);
+        }
+
+        [Test]
         public void ManualInputParser_should_return_several_tokenmatches()
         {
             var inputParser = new ManualInputParser(_template);
 
             inputParser.Parse(_builder.Token);
 
-            inputParser.Matches.Any().ShouldBeTrue();
+            //inputParser.Any().ShouldBeTrue();
         }
 
         [Test]
