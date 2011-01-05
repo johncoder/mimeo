@@ -34,10 +34,13 @@ namespace Mimeo.Parsing
                 switch(result)
                 {
                     case ProcessTokenResult.Simple:
+                        stencil.Add(token.CreateSpace());
                         break;
                     case ProcessTokenResult.Complex:
+                        stencil.Add(token.CreateSpace());
                         break;
                     case ProcessTokenResult.NotAToken:
+                    default:
                         continue;
                 }
             }
@@ -54,25 +57,25 @@ namespace Mimeo.Parsing
 
             foreach (var child in token.Children)
             {
-                if (!string.IsNullOrEmpty(child.Identifier))
+                if (string.IsNullOrEmpty(child.Identifier))
+                    continue;
+
+                if (CurrentIsToken(_currentPosition, child.Identifier))
                 {
-                    if (CurrentIsToken(_currentPosition, child.Identifier))
+                    stencil.Add(new Positive(stringBuilder.ToString()));
+                    stringBuilder.Clear();
+
+                    _currentToken = child;
+                    _currentPosition += child.Identifier.Length - 1;
+
+                    if (string.IsNullOrEmpty(child.Terminator))
                     {
-                        stencil.Add(new Positive(stringBuilder.ToString()));
-                        stringBuilder.Clear();
-
-                        _currentToken = child;
-                        _currentPosition += child.Identifier.Length - 1;
-
-                        if (string.IsNullOrEmpty(child.Terminator))
-                        {
-                            return ProcessTokenResult.Simple;
-                        }
-                        
-                        return ProcessTokenResult.Complex;
+                        stringBuilder.Append(c);
+                        return ProcessTokenResult.Simple;
                     }
 
                     stringBuilder.Append(c);
+                    return ProcessTokenResult.Complex;
                 }
             }
 

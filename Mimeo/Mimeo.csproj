@@ -61,6 +61,7 @@
     <Compile Include="Templating\Positive.cs" />
     <Compile Include="Templating\SimpleNegative.cs" />
     <Compile Include="Templating\Space.cs" />
+    <Compile Include="Templating\SpaceType.cs" />
     <Compile Include="Templating\Stencil.cs" />
   </ItemGroup>
   <ItemGroup />

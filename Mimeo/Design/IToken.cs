@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mimeo.Templating;
 
 namespace Mimeo.Design
 {
@@ -14,6 +15,8 @@ namespace Mimeo.Design
         IToken Parent { get; set; }
         void SetParent(IToken token);
         void AddChild(IToken token);
+        Space CreateSpace();
+        Space CreateSpace(IEnumerable<Space> spaces);
     }
 
     public interface IToken<TModel> : IToken

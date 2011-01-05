@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mimeo.Internal;
+using Mimeo.Templating;
 
 namespace Mimeo.Design
 {
@@ -62,6 +63,16 @@ namespace Mimeo.Design
                 return true;
 
             return Condition(model);
+        }
+
+        public virtual Space CreateSpace()
+        {
+            return new SimpleNegative(this);
+        }
+
+        public virtual Space CreateSpace(IEnumerable<Space> spaces)
+        {
+            return new SimpleNegative(this);
         }
     }
 }

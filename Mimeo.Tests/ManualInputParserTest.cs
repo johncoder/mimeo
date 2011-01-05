@@ -7,6 +7,7 @@ using Mimeo.Design.Syntax;
 using Mimeo.Parsing;
 using NUnit.Framework;
 using Should;
+using Mimeo.Templating;
 
 namespace Mimeo.Tests
 {
@@ -59,7 +60,7 @@ namespace Mimeo.Tests
         public void ManualInputParser_Parse_should_return_single_simple_negative_space()
         {
             var inputParser = new ManualInputParser("{PageTitle}");
-
+            
             var stencil = inputParser.Parse(_builder.Token);
 
             stencil.Count().ShouldEqual(1);
@@ -78,9 +79,9 @@ namespace Mimeo.Tests
         {
             var inputParser = new ManualInputParser(_template);
 
-            inputParser.Parse(_builder.Token);
+            var stencil = inputParser.Parse(_builder.Token);
 
-            //inputParser.Any().ShouldBeTrue();
+            stencil.Any().ShouldBeTrue();
         }
 
         [Test]
