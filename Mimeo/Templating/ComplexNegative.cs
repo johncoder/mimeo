@@ -9,9 +9,9 @@ namespace Mimeo.Templating
     public class ComplexNegative<TModel, TChild> : Space
     {
         private readonly ICollection<Space> _spaces;
-        private readonly IToken<TModel, TChild> _token;
+        private readonly IBlockToken<TModel> _token;
 
-        public ComplexNegative(IToken<TModel, TChild> token, IEnumerable<Space> spaces)
+        public ComplexNegative(IBlockToken<TModel> token, IEnumerable<Space> spaces)
         {
             _token = token;
             _spaces = spaces.ToList();

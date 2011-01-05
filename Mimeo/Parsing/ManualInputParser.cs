@@ -31,15 +31,17 @@ namespace Mimeo.Parsing
             {
                 var result = ProcessChildTokens(token, stencil, stringBuilder);
 
-                switch(result)
+                switch(result.Type)
                 {
-                    case ProcessTokenResult.Simple:
+                    case TokenType.Simple:
                         stencil.Add(token.CreateSpace());
                         break;
-                    case ProcessTokenResult.Complex:
+                    case TokenType.Complex:
                         stencil.Add(token.CreateSpace());
+                        var block = result.Token as IBlockToken<>
+                        stencil.Add(factory.Create());
                         break;
-                    case ProcessTokenResult.NotAToken:
+                    case TokenType.NotAToken:
                     default:
                         continue;
                 }
@@ -58,7 +60,9 @@ namespace Mimeo.Parsing
             foreach (var child in token.Children)
             {
                 if (string.IsNullOrEmpty(child.Identifier))
+                {
                     continue;
+                }
 
                 if (CurrentIsToken(_currentPosition, child.Identifier))
                 {
@@ -72,17 +76,30 @@ namespace Mimeo.Parsing
                     {
                         stringBuilder.Append(c);
                         return ProcessTokenResult.Simple;
+                        //return ProcessTokenResult.Simple;
+                        return result;
                     }
 
-                    stringBuilder.Append(c);
+                    //return ProcessTokenResult.Complex;
+                    return complex;
+                stringBuilder.Append(c);
                     return ProcessTokenResult.Complex;
-                }
             }
 
-            return ProcessTokenResult.NotAToken;
+            var notAToken = new ProcessTokenResult {Type = TokenType.NotAToken};
+            //return ProcessTokenResult.NotAToken;
+            return notAToken;
         }
 
-        enum ProcessTokenResult
+
+        public class ProcessTokenResult
+        {
+            public int Position { get; set; }
+            public TokenType Type { get; set; }
+            public IToken Token { get; set; }
+        }
+
+        public enum TokenType
         {
             Simple,
             Complex,

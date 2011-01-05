@@ -27,8 +27,8 @@ namespace Mimeo.Design
         //bool CanHandle(TModel model);
     }
 
-    public interface IToken<TModel, TChild> : IToken<TModel>
+    public interface IBlockToken<TModel> : IToken<TModel>
     {
-        Func<TModel, IEnumerable<TChild>> Items { get; set; }
+        Func<TModel, IEnumerable<object>> Items { get; set; }
     }
 }

@@ -4,9 +4,9 @@ using Mimeo.Templating;
 
 namespace Mimeo.Design
 {
-    public class BlockToken<TModel, TChild> : Token<TModel>, IToken<TModel, TChild>
+    public class BlockToken<TModel> : Token<TModel>, IBlockToken<TModel>
     {
-        public Func<TModel, IEnumerable<TChild>> Items { get; set; }
+        public Func<TModel, IEnumerable<object>> Items { get; set; }
 
         public override Space CreateSpace()
         {
