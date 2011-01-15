@@ -30,16 +30,14 @@ namespace Mimeo.Parsing
             for (int i = start; i < _template.Length; i++)
             {
                 var result = ProcessChildTokens(token, stencil, stringBuilder);
-                //i = result.Position;
+                i = _currentPosition;
                 switch(result.Type)
                 {
                     case TokenType.Simple:
                         stencil.Add(token.CreateSpace());
-                        //i = result.Position;
                         break;
                     case TokenType.Complex:
                         stencil.Add(token.CreateSpace());
-                        //i = result.Position;
                         break;
                     case TokenType.NotAToken:
                     default:
@@ -69,25 +67,31 @@ namespace Mimeo.Parsing
                     if (_currentPosition > 0)
                         stencil.Add(new Positive(stringBuilder.ToString()));
 
-                    stringBuilder.Clear();
+                    //stringBuilder.Clear();
 
                     _currentToken = child;
-                    _currentPosition += child.Identifier.Length - 1;
+
+                    //if (_currentPosition == 0)
+                    //    _currentPosition += child.Identifier.Length;
+                    //else
+                    _currentPosition += child.Identifier.Length;
 
                     if (string.IsNullOrEmpty(child.Terminator))
                     {
-                        stringBuilder.Append(c);
+                        //stringBuilder.Append(c);
                         var result = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Simple };
                         return result;
                     }
 
                     var complex = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Complex };
-                    stringBuilder.Append(c);
+                    //stringBuilder.Append(c);
                     return complex;
                 }
             }
 
-            var notAToken = new ProcessTokenResult {Type = TokenType.NotAToken};
+            _currentPosition++;
+
+            var notAToken = new ProcessTokenResult {Type = TokenType.NotAToken, Position = _currentPosition};
             return notAToken;
         }
 

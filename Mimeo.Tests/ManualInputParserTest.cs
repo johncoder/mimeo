@@ -8,6 +8,7 @@ using Mimeo.Parsing;
 using NUnit.Framework;
 using Should;
 using Mimeo.Templating;
+using System;
 
 namespace Mimeo.Tests
 {
@@ -30,6 +31,13 @@ namespace Mimeo.Tests
                     ctx.Tokenize(b => b.PostTitle, @"{Title}");
                     ctx.Tokenize(b => b.PostDescription, @"{Description}");
                     ctx.Tokenize(b => b.PostBody, @"{PostBody}");
+                    ctx.Tokenize(d => d.Comments, @"{Comments}")
+                        .AsBlock(commentContext =>
+                        {
+                            commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
+                            commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
+                            commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
+                        }).EndsWith(@"{/Comments}");
                 }).EndsWith(@"{/Post}");
             _builder.Tokenize(b => b.Posts, @"{Posts}")
                 .AsBlock(postContext =>
@@ -63,7 +71,7 @@ namespace Mimeo.Tests
             var inputParser = new ManualInputParser("{PageTitle}");
             
             var stencil = inputParser.Parse(_builder.Token);
-
+            
             stencil.Count().ShouldEqual(1);
         }
 
@@ -104,5 +112,46 @@ namespace Mimeo.Tests
 
             inputParser.CurrentIsToken(1, "{PageTitle}").ShouldBeFalse();
         }
+
+        [Test]
+        public void ManualInputParser_Parse_returns_3_results()
+        {
+            const string template = "...{PageTitle}...";
+
+            var inputParser = new ManualInputParser(template);
+
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(3);
+            stencil.ElementAt(0).ShouldBeType<Positive>();
+            stencil.ElementAt(1).ShouldBeType<SimpleNegative>();
+            stencil.ElementAt(2).ShouldBeType<Positive>();
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_returns_3_results_for_token_literal_token()
+        {
+            const string template = "{PageTitle}...{PageTitle}";
+
+            var inputParser = new ManualInputParser(template);
+
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(3);
+            stencil.ElementAt(0).ShouldBeType<SimpleNegative>();
+            stencil.ElementAt(1).ShouldBeType<Positive>();
+            stencil.ElementAt(2).ShouldBeType<SimpleNegative>();
+        }
+
+        //[Test]
+        //public void ManualInputParser_Parse_block_creates_complex_negative()
+        //{
+        //    const string template = @"{Post}...{Comments}...{Comment.Email}...{/Comments}...{/Post}";
+        //    var inputParser = new ManualInputParser(template);
+        //    var stencil = inputParser.Parse(_builder.Token);
+
+        //    stencil.Any().ShouldBeTrue();
+        //    stencil.Count().ShouldEqual(5);
+        //}
     }
 }
