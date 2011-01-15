@@ -13,6 +13,8 @@ namespace Mimeo.Templating
 
         public ComplexNegative(IBlockToken<TModel> token, IEnumerable<Space> spaces)
         {
+            Ensure.ArgumentNotNull(token, "token");
+
             _token = token;
             _spaces = spaces.ToList();
         }

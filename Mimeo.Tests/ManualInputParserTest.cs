@@ -11,6 +11,7 @@ using Mimeo.Templating;
 
 namespace Mimeo.Tests
 {
+    [TestFixture]
     public class ManualInputParserTest
     {
         private ITokenRoot<BlogTemplate> _builder;

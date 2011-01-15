@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mimeo.Templating;
+using System.Collections;
 
 namespace Mimeo.Design
 {
-    public class BlockToken<TModel> : Token<TModel>, IBlockToken<TModel>
+    public class BlockToken<TModel, TChild> : Token<TModel>, IBlockToken<TModel, TChild>
     {
         public Func<TModel, IEnumerable<object>> Items { get; set; }
 

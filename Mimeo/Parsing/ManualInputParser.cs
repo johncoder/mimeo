@@ -30,16 +30,16 @@ namespace Mimeo.Parsing
             for (int i = start; i < _template.Length; i++)
             {
                 var result = ProcessChildTokens(token, stencil, stringBuilder);
-
+                //i = result.Position;
                 switch(result.Type)
                 {
                     case TokenType.Simple:
                         stencil.Add(token.CreateSpace());
+                        //i = result.Position;
                         break;
                     case TokenType.Complex:
                         stencil.Add(token.CreateSpace());
-                        var block = result.Token as IBlockToken<>
-                        stencil.Add(factory.Create());
+                        //i = result.Position;
                         break;
                     case TokenType.NotAToken:
                     default:
@@ -47,7 +47,7 @@ namespace Mimeo.Parsing
                 }
             }
 
-            if (stringBuilder.Length > 0)
+            if (_template.Length - _currentPosition > 0)
                 stencil.Add(new Positive(stringBuilder.ToString()));
 
             return stencil;
@@ -66,7 +66,9 @@ namespace Mimeo.Parsing
 
                 if (CurrentIsToken(_currentPosition, child.Identifier))
                 {
-                    stencil.Add(new Positive(stringBuilder.ToString()));
+                    if (_currentPosition > 0)
+                        stencil.Add(new Positive(stringBuilder.ToString()));
+
                     stringBuilder.Clear();
 
                     _currentToken = child;
@@ -75,19 +77,17 @@ namespace Mimeo.Parsing
                     if (string.IsNullOrEmpty(child.Terminator))
                     {
                         stringBuilder.Append(c);
-                        return ProcessTokenResult.Simple;
-                        //return ProcessTokenResult.Simple;
+                        var result = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Simple };
                         return result;
                     }
 
-                    //return ProcessTokenResult.Complex;
+                    var complex = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Complex };
+                    stringBuilder.Append(c);
                     return complex;
-                stringBuilder.Append(c);
-                    return ProcessTokenResult.Complex;
+                }
             }
 
             var notAToken = new ProcessTokenResult {Type = TokenType.NotAToken};
-            //return ProcessTokenResult.NotAToken;
             return notAToken;
         }
 

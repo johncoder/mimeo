@@ -56,7 +56,7 @@ namespace Mimeo.Design
             {
                 Resolve = p => string.Empty,
                 Identifier = identifier,
-                Items = children
+                Items = item => children as IEnumerable<object>
             };
             Token.Children.Add(_currentToken);
 

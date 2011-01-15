@@ -31,4 +31,9 @@ namespace Mimeo.Design
     {
         Func<TModel, IEnumerable<object>> Items { get; set; }
     }
+
+    public interface IBlockToken<TModel, out TChild> : IBlockToken<TModel>
+    {
+
+    }
 }
