@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Mimeo.Design;
 using Mimeo.Templating;
 

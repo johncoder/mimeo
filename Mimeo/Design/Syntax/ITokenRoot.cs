@@ -29,12 +29,6 @@ namespace Mimeo.Design.Syntax
         
     }
 
-    //public interface ITokenBegin<TModel, TChild> : ITokenSyntax
-    //{
-    //    ITokenBlock<TModel, TChild> AsBlock(Action<ITokenRoot<TChild>> context);
-    //    ITokenBlock<TModel, TChild> AsBlock(ITokenRoot<TChild> context);
-    //}
-
     public interface ITokenBlock<TModel, TChild> : ITokenSyntax
     {
         ITokenBlock<TModel, TChild> EndsWith(string terminator);

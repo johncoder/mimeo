@@ -24,7 +24,6 @@ namespace Mimeo.Design
         Func<TModel, string> Resolve { get; set; }
         Func<TModel, bool> Condition { get; set; }
         string GetValue(TModel model);
-        //bool CanHandle(TModel model);
     }
 
     public interface IBlockToken<TModel> : IToken<TModel>

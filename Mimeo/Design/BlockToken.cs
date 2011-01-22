@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Mimeo.Templating;
-using System.Collections;
 
 namespace Mimeo.Design
 {
