@@ -25,29 +25,25 @@ namespace Mimeo.Tests
 
             _builder = new TokenBuilder<BlogTemplate>();
             _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
-            _builder.Tokenize(b => b.Post, @"{Post}", b => b.Post != null)
-                .AsBlock(ctx =>
+            _builder.Block(b => b.Post, @"{Post}", b => b.Post != null, ctx =>
                 {
                     ctx.Tokenize(b => b.PostTitle, @"{Title}");
                     ctx.Tokenize(b => b.PostDescription, @"{Description}");
                     ctx.Tokenize(b => b.PostBody, @"{PostBody}");
-                    ctx.Tokenize(d => d.Comments, @"{Comments}")
-                        .AsBlock(commentContext =>
+                    ctx.Block(d => d.Comments, @"{Comments}", commentContext =>
                         {
                             commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
                             commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
                             commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
                         }).EndsWith(@"{/Comments}");
                 }).EndsWith(@"{/Post}");
-            _builder.Tokenize(b => b.Posts, @"{Posts}")
-                .AsBlock(postContext =>
+            _builder.Block(b => b.Posts, @"{Posts}", postContext =>
                 {
                     postContext.Tokenize(d => d.PostTitle, @"{Post.Title}");
                     postContext.Tokenize(d => d.PostDescription, @"{Post.Description}");
                     postContext.Tokenize(d => d.PostBody, @"{Post.Body}").Encode(false);
                     postContext.Tokenize(d => d.PostedOn.ToShortDateString(), @"{Post.Date}");
-                    postContext.Tokenize(d => d.Comments, @"{Comments}")
-                        .AsBlock(commentContext =>
+                    postContext.Block(d => d.Comments, @"{Comments}", commentContext =>
                         {
                             commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
                             commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
@@ -81,6 +77,7 @@ namespace Mimeo.Tests
             var inputParser = new ManualInputParser("asdf");
             var stencil = inputParser.Parse(_builder.Token);
             stencil.Count().ShouldEqual(1);
+            stencil.Single().ShouldBeType<Positive>();
         }
 
         [Test]
@@ -143,15 +140,15 @@ namespace Mimeo.Tests
             stencil.ElementAt(2).ShouldBeType<SimpleNegative>();
         }
 
-        //[Test]
-        //public void ManualInputParser_Parse_block_creates_complex_negative()
-        //{
-        //    const string template = @"{Post}...{Comments}...{Comment.Email}...{/Comments}...{/Post}";
-        //    var inputParser = new ManualInputParser(template);
-        //    var stencil = inputParser.Parse(_builder.Token);
+        [Test]
+        public void ManualInputParser_Parse_block_creates_complex_negative()
+        {
+            const string template = @"{Post}......{/Post}";
+            var inputParser = new ManualInputParser(template);
+            var stencil = inputParser.Parse(_builder.Token);
 
-        //    stencil.Any().ShouldBeTrue();
-        //    stencil.Count().ShouldEqual(5);
-        //}
+            stencil.Any().ShouldBeTrue();
+            stencil.Count().ShouldEqual(1);
+        }
     }
 }

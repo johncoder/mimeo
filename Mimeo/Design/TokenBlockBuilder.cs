@@ -1,40 +1,46 @@
-﻿using System;
-using Mimeo.Design.Syntax;
+﻿using Mimeo.Design.Syntax;
 using Mimeo.Internal;
-using Mimeo.Templating;
-using System.Collections.Generic;
 
 namespace Mimeo.Design
 {
-    public class TokenBlockBuilder<TModel, TChild> : IConditionalToken<TModel, TChild>, ITokenBlock<TModel, TChild>
+    public class TokenBlockBuilder<TModel, TChild> : IConditionalToken<TModel, TChild>
     {
         private readonly IToken _token;
 
         public TokenBlockBuilder(IToken token)
         {
+            Ensure.ArgumentNotNull(token, "token");
             _token = token;
         }
 
-        public ITokenBlock<TModel, TChild> AsBlock(Action<ITokenRoot<TChild>> context)
-        {
-            Ensure.ArgumentNotNull(context, "context");
+        //public ITokenBlock<TModel, TChild> AsBlock(Action<ITokenRoot<TChild>> context)
+        //{
+        //    Ensure.ArgumentNotNull(context, "context");
 
-            var builder = new TokenBuilder<TChild>();
-            context(builder);
-            AsBlock(builder);
+        //    var builder = new TokenBuilder<TChild>();
+        //    context(builder);
+        //    AsBlock(builder);
 
-            return this;
-        }
+        //    return this;
+        //}
 
-        public ITokenBlock<TModel, TChild> AsBlock(ITokenRoot<TChild> context)
-        {
-            Ensure.ArgumentNotNull(context, "context");
-            
-            foreach(var token in context.Token.Children)
-                _token.AddChild(token);
+        //public ITokenBlock<TModel, TChild> AsBlock(ITokenRoot<TChild> context)
+        //{
+        //    Ensure.ArgumentNotNull(context, "context");
 
-            return this;
-        }
+        //    var blockToken = new BlockToken<TModel, TChild>();
+
+        //    blockToken.Identifier = _token.Identifier;
+        //    blockToken.Parent = _token.Parent;
+        //    blockToken.Children = _token.Children;
+
+        //    _token = blockToken;
+
+        //    foreach(var token in context.Token.Children)
+        //        _token.AddChild(token);
+
+        //    return this;
+        //}
 
         public ITokenBlock<TModel, TChild> EndsWith(string terminator)
         {

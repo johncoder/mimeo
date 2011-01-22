@@ -10,9 +10,14 @@ namespace Mimeo.Design.Syntax
     {
         IToken Token { get; }
         ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier);
-        IConditionalToken<TModel, TChild> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier,
-                                                           Func<TModel, bool> condition);
-        ITokenBegin<TModel, TChild> Tokenize<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier);
+
+        IConditionalToken<TModel, TChild> Block<TChild>(Func<TModel, TChild> replacement, string identifier,
+                                                           Func<TModel, bool> condition, Action<ITokenRoot<TChild>> context);
+        IConditionalToken<TModel, TChild> Block<TChild>(Func<TModel, TChild> replacement, string identifier,
+                                                           Func<TModel, bool> condition, ITokenRoot<TChild> builder);
+
+        ITokenBlock<TModel, TChild> Block<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier, Action<ITokenRoot<TChild>> context);
+        ITokenBlock<TModel, TChild> Block<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier, ITokenRoot<TChild> builder);
     }
 
     public interface ISimpleToken<TModel> : ITokenSyntax
@@ -20,16 +25,16 @@ namespace Mimeo.Design.Syntax
         ISimpleToken<TModel> Encode(bool shouldEncode);
     }
 
-    public interface IConditionalToken<TModel, TChild> : ITokenBegin<TModel, TChild>
+    public interface IConditionalToken<TModel, TChild> : ITokenBlock<TModel, TChild>
     {
         
     }
 
-    public interface ITokenBegin<TModel, TChild> : ITokenSyntax
-    {
-        ITokenBlock<TModel, TChild> AsBlock(Action<ITokenRoot<TChild>> context);
-        ITokenBlock<TModel, TChild> AsBlock(ITokenRoot<TChild> context);
-    }
+    //public interface ITokenBegin<TModel, TChild> : ITokenSyntax
+    //{
+    //    ITokenBlock<TModel, TChild> AsBlock(Action<ITokenRoot<TChild>> context);
+    //    ITokenBlock<TModel, TChild> AsBlock(ITokenRoot<TChild> context);
+    //}
 
     public interface ITokenBlock<TModel, TChild> : ITokenSyntax
     {

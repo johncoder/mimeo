@@ -10,7 +10,6 @@ namespace Mimeo.Parsing
     {
         private readonly string _template;
         private int _currentPosition;
-        private IToken _currentToken;
 
         public ManualInputParser(string template)
         {
@@ -22,24 +21,34 @@ namespace Mimeo.Parsing
             return Parse(token);
         }
 
-        public IStencil Parse(IToken token, int start = 0)
+        public IStencil Parse(IToken token, int start = 0, Space space = null, string terminator = null)
         {
+            _currentPosition = start;
             var stencil = new Stencil();
             var stringBuilder = new StringBuilder();
+            var lookForTerminator = !string.IsNullOrEmpty(terminator);
+            var terminated = false;
 
-            for (int i = start; i < _template.Length; i++)
+            while (_currentPosition < _template.Length - 1)
             {
+                if (lookForTerminator && CurrentIsToken(_currentPosition, terminator))
+                {
+                    terminated = true;
+                    break;
+                }
+
                 var result = ProcessChildTokens(token, stencil, stringBuilder);
-                i = _currentPosition;
-                switch(result.Type)
+                switch (result.Type)
                 {
                     case TokenType.Simple:
                         stencil.Add(token.CreateSpace());
                         break;
                     case TokenType.Complex:
-                        stencil.Add(token.CreateSpace());
+                        var s = result.Token.CreateSpace();
+
+                        Parse(result.Token, _currentPosition, s, result.Token.Terminator);
+                        stencil.Add(s);
                         break;
-                    case TokenType.NotAToken:
                     default:
                         continue;
                 }
@@ -48,13 +57,14 @@ namespace Mimeo.Parsing
             if (_template.Length - _currentPosition > 0)
                 stencil.Add(new Positive(stringBuilder.ToString()));
 
+            if (terminated)
+                _currentPosition += terminator.Length;
+
             return stencil;
         }
 
         private ProcessTokenResult ProcessChildTokens(IToken token, Stencil stencil, StringBuilder stringBuilder)
         {
-            char c = _template[_currentPosition];
-
             foreach (var child in token.Children)
             {
                 if (string.IsNullOrEmpty(child.Identifier))
@@ -65,30 +75,27 @@ namespace Mimeo.Parsing
                 if (CurrentIsToken(_currentPosition, child.Identifier))
                 {
                     if (_currentPosition > 0)
+                    {
                         stencil.Add(new Positive(stringBuilder.ToString()));
+                        stringBuilder.Clear();
+                    }
 
-                    //stringBuilder.Clear();
-
-                    _currentToken = child;
-
-                    //if (_currentPosition == 0)
-                    //    _currentPosition += child.Identifier.Length;
-                    //else
                     _currentPosition += child.Identifier.Length;
 
                     if (string.IsNullOrEmpty(child.Terminator))
                     {
-                        //stringBuilder.Append(c);
-                        var result = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Simple };
+                        var result = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Simple, Token = child };
                         return result;
                     }
 
-                    var complex = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Complex };
-                    //stringBuilder.Append(c);
+                    var complex = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Complex, Token = child };
                     return complex;
                 }
+                
             }
 
+            char c = _template[_currentPosition];
+            stringBuilder.Append(c);
             _currentPosition++;
 
             var notAToken = new ProcessTokenResult {Type = TokenType.NotAToken, Position = _currentPosition};
