@@ -8,7 +8,6 @@ namespace Mimeo.Design.Syntax
 
     public interface ITokenRoot<TModel> : ITokenSyntax
     {
-        IToken Token { get; }
         ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier);
 
         IConditionalToken<TModel, TChild> Block<TChild>(Func<TModel, TChild> replacement, string identifier,

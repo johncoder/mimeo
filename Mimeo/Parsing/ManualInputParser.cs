@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using Mimeo.Design;
 using Mimeo.Internal;
 using Mimeo.Templating;
@@ -9,16 +7,12 @@ namespace Mimeo.Parsing
 {
     public class ManualInputParser : IInputParser
     {
-        private readonly string _template;
+        private string _template;
         private int _currentPosition;
 
-        public ManualInputParser(string template)
+        IStencil IInputParser.Parse(IToken token, string template)
         {
             _template = template;
-        }
-
-        IStencil IInputParser.Parse(IToken token)
-        {
             return Parse(token);
         }
 
@@ -30,7 +24,7 @@ namespace Mimeo.Parsing
                 current.Add(space);
         }
 
-        public IStencil Parse(IToken token, int start = 0, IStencil newStencil = null, string terminator = null)
+        protected IStencil Parse(IToken token, int start = 0, IStencil newStencil = null, string terminator = null)
         {
             _currentPosition = start;
             var stencil = new Stencil();
@@ -40,7 +34,7 @@ namespace Mimeo.Parsing
             
             while (_currentPosition < _template.Length - 1)
             {
-                if (lookForTerminator && CurrentIsToken(_currentPosition, terminator))
+                if (lookForTerminator && CurrentIsToken(terminator))
                 {
                     terminated = true;
                     break;
@@ -92,7 +86,7 @@ namespace Mimeo.Parsing
                     continue;
                 }
 
-                if (CurrentIsToken(_currentPosition, child.Identifier))
+                if (CurrentIsToken(child.Identifier))
                 {
                     if (_currentPosition > 0 && stringBuilder.Length > 0)
                     {
@@ -137,17 +131,17 @@ namespace Mimeo.Parsing
             NotAToken
         }
 
-        public bool CurrentIsToken(int start, string identifier)
+        public bool CurrentIsToken(string identifier)
         {
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
             int step = 0;
-            int end = start + identifier.Length;
+            int end = _currentPosition + identifier.Length;
 
             if (end > _template.Length)
                 return false;
 
-            for (int i = start; i < end; i++)
+            for (int i = _currentPosition; i < end; i++)
             {
                 if (_template[i] != identifier[step])
                     return false;

@@ -10,9 +10,11 @@ namespace Mimeo.Design
         public IToken Token { get; protected set; }
         private Token<TModel> _currentToken;
 
-        public TokenBuilder()
+        public TokenBuilder() : this(new Token<TModel>()) { }
+
+        public TokenBuilder(IToken<TModel> token)
         {
-            Token = new Token<TModel>();
+            Token = token;
         }
 
         public ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier)

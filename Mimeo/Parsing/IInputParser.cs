@@ -6,6 +6,6 @@ namespace Mimeo.Parsing
 {
     public interface IInputParser
     {
-        IStencil Parse(IToken token);
+        IStencil Parse(IToken token, string template);
     }
 }

@@ -6,7 +6,7 @@ namespace Mimeo.Design
     public class TokenBlockBuilder<TModel, TChild> : IConditionalToken<TModel, TChild>
     {
         private readonly IToken _token;
-
+        public IToken Token { get { return _token; } }
         public TokenBlockBuilder(IToken token)
         {
             Ensure.ArgumentNotNull(token, "token");
