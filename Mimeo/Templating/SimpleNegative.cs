@@ -15,17 +15,40 @@ namespace Mimeo.Templating
         
         public override void GetContents(object model, StringBuilder stringBuilder)
 		{
-		    var token = _token;
+            //var token = _token;
 
-		    do
-		    {
+            //do
+            //{
+            //    if (!token.CanHandle(model))
+            //        token = token.Parent;
+
+            //} while (token != null && !token.CanHandle(model));
+
+            //if (token != null && token.CanHandle(model))
+            //    stringBuilder.Append(token.GetValue(model));
+
+            foreach (var child in _token.Children)
+            {
+                if (!child.CanHandle(model))
+                    continue;
+                
+                stringBuilder.Append(child.GetValue(model));
+                return;
+            }
+
+            var token = _token;
+
+            do
+            {
                 if (!token.CanHandle(model))
                     token = token.Parent;
-
-		    } while (token != null && !token.CanHandle(model));
+            } while (token != null && !token.CanHandle(model));
 
             if (token != null && token.CanHandle(model))
-		        stringBuilder.Append(token.GetValue(model));
+            {
+                stringBuilder.Append(_token.GetValue(model));
+                return;
+            }
 		}
 
         public override bool CanHandle(object model)

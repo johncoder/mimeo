@@ -38,12 +38,33 @@ namespace Mimeo.Templating
                     if (space.CanHandle(item))
                     {
                         if (space.ShouldHandle(item))
+                        {
                             space.GetContents(item, stringBuilder);
+                            continue;
+                        }
+                    }
+                    else if (_token.CanHandle(item))
+                    {
+                        stringBuilder.Append(_token.GetValue(item));
+                        continue;
+                    }
+                    else if (_token.Children.Any(c => c.CanHandle(item)))
+                    {
+                        foreach (var child in _token.Children)
+                            if (child.CanHandle(item))
+                            {
+                                stringBuilder.Append(child.GetValue(item));
+                                break;
+                            }
+                        continue;
                     }
                     else
                     {
-                        if (space.CanHandle(model) && space.ShouldHandle(model))
-                            space.GetContents(model, stringBuilder);
+                        if (space.CanHandle(item) && space.ShouldHandle(item))
+                        {
+                            space.GetContents(item, stringBuilder);
+                            continue;
+                        }
                     }
                 }
             }

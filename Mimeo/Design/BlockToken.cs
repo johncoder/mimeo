@@ -8,9 +8,14 @@ namespace Mimeo.Design
     {
         public Func<TModel, IEnumerable<object>> Items { get; set; }
 
+        public BlockToken()
+        {
+            Items = m => new List<object>();
+        }
+
         public override Space CreateSpace()
         {
-            return new ComplexNegative<TModel, TChild>(this, new List<Space>());
+            return CreateSpace(new List<Space>());
         }
 
         public override Space CreateSpace(IEnumerable<Space> spaces)

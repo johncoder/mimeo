@@ -1,57 +1,96 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Mimeo.Design;
-using Mimeo.Design.Syntax;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
+using Should;
 
 namespace Mimeo.Tests
 {
     [TestFixture]
     public class StencilTests
     {
-        private ITokenRoot<BlogTemplate> _builder;
+        private Mimeo<BlogTemplate> _mimeo;
 
         [SetUp]
         public void SetUp()
         {
-            _builder = new TokenBuilder<BlogTemplate>();
-            _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
-            _builder.Tokenize(b => b.JavaScriptIncludes, @"{JavaScriptIncludes}");
-            _builder.Block(b => b.Post, @"{Post}", b => b.Post != null, ctx =>
+            _mimeo = new Mimeo<BlogTemplate>(b =>
             {
-                ctx.Tokenize(b => b.PostTitle, @"{Title}");
-                ctx.Tokenize(b => b.PostDescription, @"{Description}");
-                ctx.Tokenize(b => b.PostBody, @"{PostBody}");
-                ctx.Block(d => d.Comments, @"{Comments}", commentContext =>
+                b.Tokenize(p => p.BlogTitle, "{BlogTitle}");
+                b.Tokenize(p => p.PageTitle, "{PageTitle}");
+                b.Tokenize(p => p.JavaScriptIncludes, "{JavaScriptIncludes}");
+                b.Block(p => p.Posts, "{Posts}", block =>
                 {
-                    commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
-                    commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
-                    commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
-                }).EndsWith(@"{/Comments}");
-            }).EndsWith(@"{/Post}");
-            _builder.Block(b => b.Posts, @"{Posts}", postContext =>
-            {
-                postContext.Tokenize(d => d.PostTitle, @"{Post.Title}");
-                postContext.Tokenize(d => d.PostDescription, @"{Post.Description}");
-                postContext.Tokenize(d => d.PostBody, @"{Post.Body}").Encode(false);
-                postContext.Tokenize(d => d.PostedOn.ToShortDateString(), @"{Post.Date}");
-                postContext.Block(d => d.Comments, @"{Comments}", commentContext =>
-                {
-                    commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
-                    commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
-                    commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
-                }).EndsWith(@"{/Comments}");
-            }).EndsWith(@"{/Posts}");
+                    block.Tokenize(p => p.PostTitle, "{PostTitle}");
+                    block.Tokenize(p => p.PostDescription, "{PostDescription}");
+                    block.Tokenize(p => p.PostBody, "{PostBody}");
+                    block.Block(p => p.Comments, "{Comments}", comments =>
+                    {
+                        comments.Tokenize(c => c.Author, "{Author}");
+                        comments.Tokenize(c => c.Email, "{Email}");
+                        comments.Tokenize(c => c.Text, "{CommentText}");
+                    }).EndsWith("{/Comments}");
+                }).EndsWith("{/Posts}");
+            });
         }
 
         [Test]
         public void Stencil_GetContent_fills_single_positive()
         {
-            const string template = "asdf";
+            const string template = "asdfasdf";
 
-            var mimeo = new Mimeo();
+            _mimeo.CreateStencil("newtemplate", template);
+
+            _mimeo.Render("newtemplate", new BlogTemplate()).ShouldEqual("asdfasdf");
+        }
+
+        [Test]
+        public void Stencil_GetContent_replaces_blogtitle()
+        {
+            const string template = "{BlogTitle}";
+
+            _mimeo.CreateStencil("newtemplate", template);
+
+            _mimeo.Render("newtemplate", new BlogTemplate{BlogTitle = "asdf"}).ShouldEqual("asdf");
+        }
+
+        [Test]
+        public void Stencil_GetContents_replaces_BlogTitle_and_preserves_plaintext()
+        {
+            const string template = "asdf{BlogTitle}asdf";
+
+            _mimeo.CreateStencil("newtemplate", template);
+
+            _mimeo.Render("newtemplate", new BlogTemplate { BlogTitle = "ASDF" }).ShouldEqual("asdfASDFasdf");
+        }
+
+        [Test]
+        public void Stencil_GetContents_handles_block()
+        {
+            const string template = "{Posts}.{/Posts}";
+            _mimeo.CreateStencil("newtemplate", template);
+            var blog = new BlogTemplate { Posts = new List<BlogPost> { new BlogPost(), new BlogPost(), new BlogPost() } };
+            var result = _mimeo.Render("newtemplate", blog);
+            result.ShouldEqual("...");
+        }
+
+        [Test]
+        public void Stencil_GetContents_handles_block_with_posttitles()
+        {
+            const string template = "{Posts}.{PostTitle}.{/Posts}";
+
+            var stencil = _mimeo.CreateStencil("newtemplate", template);
+
+            var blog = new BlogTemplate
+            {
+                Posts = new List<BlogPost>
+                {
+                    new BlogPost { PostTitle = "1" },
+                    new BlogPost { PostTitle = "2" },
+                    new BlogPost { PostTitle = "3" } 
+                }
+            };
+
+            var result = _mimeo.Render("newtemplate", blog);
+            result.ShouldEqual(".1..2..3.");
         }
     }
 }

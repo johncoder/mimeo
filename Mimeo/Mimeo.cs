@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using Mimeo.Design;
 using Mimeo.Design.Syntax;
 using Mimeo.Parsing;
@@ -8,56 +8,56 @@ using Mimeo.Templating;
 
 namespace Mimeo
 {
-    public interface IMimeo
+    public abstract class Mimeo
     {
-        IInputParser Parser { get; set; }
-        ITokenRoot<TModel> GetBuilder<TModel>(string name);
-        IStencil Parse(string name, string template);
-
+        public abstract string Render(string name, object obj);
     }
 
-    public class Mimeo : IMimeo
+    public class Mimeo<TModel> : Mimeo, IMimeo<TModel>
     {
-        private ICollection<Tuple<string, ITokenSyntax, IStencil>> Templates { get; set; }
+        private IDictionary<string, IStencil> Stencils { get; set; }
 
-        public Mimeo()
-        {
-            Templates = new List<Tuple<string, ITokenSyntax, IStencil>>();
-            Parser = new ManualInputParser();
-        }
-
+        public ITokenRoot<TModel> Builder { get; set; }
         public IInputParser Parser { get; set; }
 
-        public ITokenRoot<TModel> GetBuilder<TModel>(string name)
+        public Mimeo() : this(b => {}, new ManualInputParser()) { }
+
+        public Mimeo(Action<ITokenRoot<TModel>> configureBuilder) : this(configureBuilder, new ManualInputParser()) { }
+
+        public Mimeo(Action<ITokenRoot<TModel>> configureBuilder, IInputParser parser)
         {
-            var row = Templates.SingleOrDefault(tuple => tuple.Item1 == name);
-            if (row == null)
-            {
-                row = new Tuple<string, ITokenSyntax, IStencil>(name, null, null);
-                Templates.Add(row);
-            }
+            Stencils = new Dictionary<string, IStencil>();
+            Parser = parser;
+            Builder = new TokenBuilder<TModel>();
 
-            var builder = row.Item2 as ITokenRoot<TModel>;
-            
-            if (builder == null)
-            {
-                builder = new TokenBuilder<TModel>(row.Item2 as IToken<TModel>);
-            }
-
-            return builder;
+            configureBuilder(Builder);
         }
 
-        public IStencil Parse(string name, string template)
+        public IStencil CreateStencil(string name, string template)
         {
-            //var row = Templates.SingleOrDefault(tuple => tuple.Item1 == name);
-            //if (row == null)
-            //    throw new Exception("Template named " + name + " does not exist.");
+            if (Stencils.ContainsKey(name))
+                return Stencils[name];
 
-            //var stencil = row.Item3;
+            if (Builder == null)
+                throw new NullReferenceException("Cannot parse template without builder. Configure a builder before creating stencils");
 
-            //if (stencil == null)
-            //    row.Item3 = Parser.Parse(row.Item2.Token, template);
-            throw new NotImplementedException();
+            var stencil = Parser.Parse(Builder.Token, template);
+
+            Stencils.Add(name, stencil);
+
+            return stencil;
+        }
+
+        public override string Render(string name, object obj)
+        {
+            return Render(name, (TModel)obj);
+        }
+
+        public string Render(string name, TModel model)
+        {
+            var stringBuilder = new StringBuilder();
+            Stencils[name].GetContents(model, stringBuilder);
+            return stringBuilder.ToString();
         }
     }
 }

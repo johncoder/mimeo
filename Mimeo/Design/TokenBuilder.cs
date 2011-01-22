@@ -15,6 +15,8 @@ namespace Mimeo.Design
         public TokenBuilder(IToken<TModel> token)
         {
             Token = token;
+            if (token.Resolve == null)
+                token.Resolve = p => string.Empty;
         }
 
         public ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier)
@@ -32,7 +34,7 @@ namespace Mimeo.Design
             return this;
         }
 
-        public IConditionalToken<TModel, TChild> Block<TChild>(Func<TModel, TChild> replacement, string identifier, Func<TModel, bool> condition, Action<ITokenRoot<TChild>> context)
+        public IConditionalToken<TModel, TChild> TokenizeIf<TChild>(Func<TModel, TChild> replacement, string identifier, Func<TModel, bool> condition, Action<ITokenRoot<TChild>> context)
         {
             Ensure.ArgumentNotNull(replacement, "replacement");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
@@ -41,10 +43,10 @@ namespace Mimeo.Design
 
             var builder = new TokenBuilder<TChild>();
             context(builder);
-            return Block(replacement, identifier, condition, builder);
+            return TokenizeIf(replacement, identifier, condition, builder);
         }
 
-        public IConditionalToken<TModel, TChild> Block<TChild>(Func<TModel, TChild> replacement, string identifier, Func<TModel, bool> condition, ITokenRoot<TChild> context)
+        public IConditionalToken<TModel, TChild> TokenizeIf<TChild>(Func<TModel, TChild> replacement, string identifier, Func<TModel, bool> condition, ITokenRoot<TChild> context)
         {
             Ensure.ArgumentNotNull(replacement, "replacement");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
@@ -88,7 +90,7 @@ namespace Mimeo.Design
             {
                 Resolve = p => string.Empty,
                 Identifier = string.Intern(identifier),
-                Items = item => children as IEnumerable<object>
+                Items = item => GetEachChild(item, children)
             };
 
             _currentToken = blockToken;
@@ -98,6 +100,12 @@ namespace Mimeo.Design
                 _currentToken.AddChild(token);
 
             return new TokenBlockBuilder<TModel, TChild>(_currentToken);
+        }
+
+        private IEnumerable<object> GetEachChild<TChild>(TModel item, Func<TModel, IEnumerable<TChild>> children)
+        {
+            foreach (var child in children(item))
+                yield return child;
         }
 
         public IConditionalToken<TModel, TChild> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Func<TModel, bool> condition)
@@ -117,21 +125,21 @@ namespace Mimeo.Design
             return new TokenBlockBuilder<TModel, TChild>(_currentToken);
         }
 
-        public ITokenBlock<TModel, TChild> Tokenize<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier)
-        {
-            Ensure.ArgumentNotNull(children, "children");
-            Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
+        //public ITokenBlock<TModel, TChild> Tokenize<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier)
+        //{
+        //    Ensure.ArgumentNotNull(children, "children");
+        //    Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
-            _currentToken = new BlockToken<TModel, TChild>
-            {
-                Resolve = p => string.Empty,
-                Identifier = identifier,
-                Items = item => children as IEnumerable<object>
-            };
-            Token.Children.Add(_currentToken);
+        //    _currentToken = new BlockToken<TModel, TChild>
+        //    {
+        //        Resolve = p => string.Empty,
+        //        Identifier = identifier,
+        //        Items = item => GetEachChild(item, children)
+        //    };
+        //    Token.Children.Add(_currentToken);
 
-            return new TokenBlockBuilder<TModel, TChild>(_currentToken);
-        }
+        //    return new TokenBlockBuilder<TModel, TChild>(_currentToken);
+        //}
 
         public ISimpleToken<TModel> Encode(bool shouldEncode)
         {

@@ -21,7 +21,7 @@ namespace Mimeo.Tests
         public void Builder_can_create_a_simple_token_and_two_blocks()
         {
             _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
-            _builder.Block(b => b.Post, @"{Post}", b => b.Post != null, ctx => {
+            _builder.TokenizeIf(b => b.Post, @"{Post}", b => b.Post != null, ctx => {
                     ctx.Tokenize(b => b.PostTitle, @"{Title}");
                     ctx.Tokenize(b => b.PostDescription, @"{Description}");
                     ctx.Tokenize(b => b.PostBody, @"{PostBody}");

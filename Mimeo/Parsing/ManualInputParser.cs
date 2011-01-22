@@ -40,12 +40,12 @@ namespace Mimeo.Parsing
                     break;
                 }
 
-                var result = ProcessChildTokens(token, stencil, stringBuilder);
+                var result = ProcessChildTokens(token, newStencil ?? stencil, stringBuilder);
                 switch (result.Type)
                 {
                     case TokenType.Simple:
-                        AddSpace(stencil, newStencil, token.CreateSpace());
-                        break;
+                        AddSpace(stencil, newStencil, result.Token.CreateSpace());
+                        continue;
                     case TokenType.Complex:
                         var s = result.Token.CreateSpace();
                         var ns = new Stencil();
@@ -56,7 +56,7 @@ namespace Mimeo.Parsing
                             s.Add(space);
 
                         AddSpace(stencil, newStencil, s);
-                        break;
+                        continue;
                     default:
                         continue;
                 }
@@ -67,6 +67,11 @@ namespace Mimeo.Parsing
                 stringBuilder.Append(_template[_currentPosition]);
                 _currentPosition++;
             }
+            
+            //if (newStencil == null && stringBuilder.Length > 0)
+            //{
+            //    AddSpace(stencil, newStencil, new Positive(stringBuilder.ToString()));
+            //}
 
             if (_template.Length - _currentPosition >= 0 && stringBuilder.Length > 0)
                 AddSpace(stencil, newStencil, new Positive(stringBuilder.ToString()));
@@ -77,7 +82,7 @@ namespace Mimeo.Parsing
             return stencil;
         }
 
-        private ProcessTokenResult ProcessChildTokens(IToken token, Stencil stencil, StringBuilder stringBuilder)
+        private ProcessTokenResult ProcessChildTokens(IToken token, IStencil stencil, StringBuilder stringBuilder)
         {
             foreach (var child in token.Children)
             {

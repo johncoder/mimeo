@@ -48,6 +48,8 @@
     <Compile Include="Design\Token.cs" />
     <Compile Include="Design\TokenBlockBuilder.cs" />
     <Compile Include="Design\TokenBuilder.cs" />
+    <Compile Include="IMimeo.cs" />
+    <Compile Include="Memographs.cs" />
     <Compile Include="Mimeo.cs" />
     <Compile Include="Parsing\IInputParser.cs" />
     <Compile Include="Parsing\ManualInputParser.cs" />

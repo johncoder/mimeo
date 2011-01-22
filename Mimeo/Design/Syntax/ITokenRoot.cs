@@ -10,9 +10,9 @@ namespace Mimeo.Design.Syntax
     {
         ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier);
 
-        IConditionalToken<TModel, TChild> Block<TChild>(Func<TModel, TChild> replacement, string identifier,
+        IConditionalToken<TModel, TChild> TokenizeIf<TChild>(Func<TModel, TChild> replacement, string identifier,
                                                            Func<TModel, bool> condition, Action<ITokenRoot<TChild>> context);
-        IConditionalToken<TModel, TChild> Block<TChild>(Func<TModel, TChild> replacement, string identifier,
+        IConditionalToken<TModel, TChild> TokenizeIf<TChild>(Func<TModel, TChild> replacement, string identifier,
                                                            Func<TModel, bool> condition, ITokenRoot<TChild> builder);
 
         ITokenBlock<TModel, TChild> Block<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier, Action<ITokenRoot<TChild>> context);
