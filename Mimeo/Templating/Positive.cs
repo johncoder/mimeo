@@ -6,6 +6,8 @@ namespace Mimeo.Templating
     {
         private readonly string _value;
 
+        public string Value { get { return _value; } }
+
         public Positive(string value)
         {
             _value = value;

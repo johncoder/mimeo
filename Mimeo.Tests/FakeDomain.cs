@@ -9,6 +9,7 @@ namespace Mimeo.Tests
         public string BlogTitle { get; set; }
         public BlogPost Post { get; set; }
         public IEnumerable<BlogPost> Posts { get; set; }
+        public string JavaScriptIncludes { get; set; }
     }
 
     class BlogPost

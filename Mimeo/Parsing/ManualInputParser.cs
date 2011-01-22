@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Mimeo.Design;
 using Mimeo.Internal;
@@ -21,14 +22,22 @@ namespace Mimeo.Parsing
             return Parse(token);
         }
 
-        public IStencil Parse(IToken token, int start = 0, Space space = null, string terminator = null)
+        private static void AddSpace(IStencil current, IStencil parent, Space space)
+        {
+            if (parent != null)
+                parent.Add(space);
+            else
+                current.Add(space);
+        }
+
+        public IStencil Parse(IToken token, int start = 0, IStencil newStencil = null, string terminator = null)
         {
             _currentPosition = start;
             var stencil = new Stencil();
             var stringBuilder = new StringBuilder();
             var lookForTerminator = !string.IsNullOrEmpty(terminator);
             var terminated = false;
-
+            
             while (_currentPosition < _template.Length - 1)
             {
                 if (lookForTerminator && CurrentIsToken(_currentPosition, terminator))
@@ -41,21 +50,32 @@ namespace Mimeo.Parsing
                 switch (result.Type)
                 {
                     case TokenType.Simple:
-                        stencil.Add(token.CreateSpace());
+                        AddSpace(stencil, newStencil, token.CreateSpace());
                         break;
                     case TokenType.Complex:
                         var s = result.Token.CreateSpace();
+                        var ns = new Stencil();
 
-                        Parse(result.Token, _currentPosition, s, result.Token.Terminator);
-                        stencil.Add(s);
+                        Parse(result.Token, _currentPosition, ns, result.Token.Terminator);
+
+                        foreach (var space in ns)
+                            s.Add(space);
+
+                        AddSpace(stencil, newStencil, s);
                         break;
                     default:
                         continue;
                 }
             }
 
-            if (_template.Length - _currentPosition > 0)
-                stencil.Add(new Positive(stringBuilder.ToString()));
+            if (newStencil == null && _template.Length - 1 == _currentPosition)
+            {
+                stringBuilder.Append(_template[_currentPosition]);
+                _currentPosition++;
+            }
+
+            if (_template.Length - _currentPosition >= 0 && stringBuilder.Length > 0)
+                AddSpace(stencil, newStencil, new Positive(stringBuilder.ToString()));
 
             if (terminated)
                 _currentPosition += terminator.Length;
@@ -74,7 +94,7 @@ namespace Mimeo.Parsing
 
                 if (CurrentIsToken(_currentPosition, child.Identifier))
                 {
-                    if (_currentPosition > 0)
+                    if (_currentPosition > 0 && stringBuilder.Length > 0)
                     {
                         stencil.Add(new Positive(stringBuilder.ToString()));
                         stringBuilder.Clear();

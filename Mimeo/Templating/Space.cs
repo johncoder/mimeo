@@ -7,6 +7,7 @@ namespace Mimeo.Templating
 	    public abstract bool CanHandle(object model);
 	    public abstract bool ShouldHandle(object model);
 		public abstract void GetContents(object model, StringBuilder stringBuilder);
+	    public virtual void Add(object obj) { }
 	}
 
 	public abstract class Space<TModel> : Space

@@ -8,7 +8,6 @@ using Mimeo.Parsing;
 using NUnit.Framework;
 using Should;
 using Mimeo.Templating;
-using System;
 
 namespace Mimeo.Tests
 {
@@ -25,6 +24,7 @@ namespace Mimeo.Tests
 
             _builder = new TokenBuilder<BlogTemplate>();
             _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
+            _builder.Tokenize(b => b.JavaScriptIncludes, @"{JavaScriptIncludes}");
             _builder.Block(b => b.Post, @"{Post}", b => b.Post != null, ctx =>
                 {
                     ctx.Tokenize(b => b.PostTitle, @"{Title}");
@@ -147,8 +147,102 @@ namespace Mimeo.Tests
             var inputParser = new ManualInputParser(template);
             var stencil = inputParser.Parse(_builder.Token);
 
-            stencil.Any().ShouldBeTrue();
             stencil.Count().ShouldEqual(1);
+            stencil.Single().ShouldBeType<ComplexNegative<BlogTemplate, BlogPost>>();
+            stencil.Single().CanHandle(new BlogTemplate()).ShouldBeTrue();
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Single().Spaces.Count().ShouldEqual(1);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_block_creates_two_complex_negative()
+        {
+            const string template = @"{Post}......{/Post}{Post}......{/Post}";
+            var inputParser = new ManualInputParser(template);
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(2);
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Count().ShouldEqual(2);
+            stencil.ElementAt(0).CanHandle(new BlogTemplate()).ShouldBeTrue();
+            stencil.ElementAt(1).CanHandle(new BlogTemplate()).ShouldBeTrue();
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().ElementAt(0).Spaces.Count().ShouldEqual(1);
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().ElementAt(1).Spaces.Count().ShouldEqual(1);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_block_creates_complex_positive_complex()
+        {
+            const string template = @"{Post}......{/Post}positive{Post}......{/Post}";
+            var inputParser = new ManualInputParser(template);
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(3);
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Count().ShouldEqual(2);
+
+            stencil.ElementAt(0).CanHandle(new BlogTemplate()).ShouldBeTrue();
+            var element0 = stencil.ElementAt(0) as ComplexNegative<BlogTemplate, BlogPost>;
+            element0.Spaces.Count().ShouldEqual(1);
+            
+            var element1 = stencil.ElementAt(1) as Positive;
+            element1.ShouldNotBeNull();
+            element1.Value.ShouldEqual("positive");
+
+            stencil.ElementAt(2).CanHandle(new BlogTemplate()).ShouldBeTrue();
+            var element2 = stencil.ElementAt(2) as ComplexNegative<BlogTemplate, BlogPost>;
+            element2.Spaces.Count().ShouldEqual(1);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_block_creates_complex_nested_complex()
+        {
+            const string template = @"{Post}{Comments}...{/Comments}{/Post}";
+            var inputParser = new ManualInputParser(template);
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(1);
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Single().Spaces.Count().ShouldEqual(1);
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Single().Spaces.Single().ShouldBeType
+                <ComplexNegative<BlogPost, Comment>>();
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Single().Spaces
+                .OfType<ComplexNegative<BlogPost, Comment>>().Single().Spaces.Count().ShouldEqual(1);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_block_creates_complex_nested_complex_surrounded_by_positives()
+        {
+            const string template = @"....{Post}{Comments}...{/Comments}{/Post}....";
+            var inputParser = new ManualInputParser(template);
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(3);
+            var element0 = stencil.ElementAt(0) as Positive;
+            element0.ShouldNotBeNull();
+            element0.Value.ShouldEqual("....");
+
+            var element1 = stencil.ElementAt(1) as ComplexNegative<BlogTemplate, BlogPost>;
+            element1.ShouldNotBeNull();
+            element1.Spaces.Count().ShouldEqual(1);
+            var element1space = element1.Spaces.Single() as ComplexNegative<BlogPost, Comment>;
+            element1space.ShouldNotBeNull();
+            var element1spacespace = element1space.Spaces.Single() as Positive;
+            element1spacespace.ShouldNotBeNull();
+            element1spacespace.Value.ShouldEqual("...");
+
+            stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Single().Spaces
+                .OfType<ComplexNegative<BlogPost, Comment>>().Single().Spaces.Count().ShouldEqual(1);
+            var element2 = stencil.ElementAt(2) as Positive;
+            element2.ShouldNotBeNull();
+            element2.Value.ShouldEqual("....");
+        }
+
+        [Test]
+        public void Try_ManualInputParser_on_template_read_from_file()
+        {
+            var inputParser = new ManualInputParser(_template);
+            var stencil = inputParser.Parse(_builder.Token);
+
+            stencil.Count().ShouldEqual(9);
+            var last = stencil.Last() as Positive;
+            last.Value.ToCharArray().ShouldEqual(_template.Reverse().Take(last.Value.Length).Reverse().ToArray());
         }
     }
 }

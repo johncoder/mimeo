@@ -11,9 +11,13 @@ namespace Mimeo.Templating
         private readonly ICollection<Space> _spaces;
         private readonly IBlockToken<TModel> _token;
 
+        public ICollection<Space> Spaces { get { return _spaces; } }
+        public IBlockToken<TModel> Token { get { return _token; } }
+
         public ComplexNegative(IBlockToken<TModel> token, IEnumerable<Space> spaces)
         {
             Ensure.ArgumentNotNull(token, "token");
+            Ensure.ArgumentNotNull(spaces, "spaces");
 
             _token = token;
             _spaces = spaces.ToList();
@@ -22,6 +26,7 @@ namespace Mimeo.Templating
         public override void GetContents(object model, StringBuilder stringBuilder)
         {
             Ensure.ArgumentNotNull(model, "model");
+            Ensure.ArgumentNotNull(stringBuilder, "stringBuilder");
 
             if (!CanHandle(model))
                 return;
@@ -42,6 +47,12 @@ namespace Mimeo.Templating
                     }
                 }
             }
+        }
+
+        public override void Add(object obj)
+        {
+            Ensure.ArgumentNotNull(obj, "obj");
+            Spaces.Add(obj as Space);
         }
 
         public override bool CanHandle(object model)
