@@ -229,7 +229,7 @@ namespace Mimeo.Tests
         }
 
         [Test]
-        public void ManualInputParser_Parse_creates_spaces_for_simple_inside_block()
+        public void ManualInputParser_Parse_creates_spaces_for_simple_inside_block_surrounded_by_1_char()
         {
             const string template = "{Posts}.{Post.Title}.{/Posts}";
             IInputParser inputParser = new ManualInputParser();
@@ -238,6 +238,32 @@ namespace Mimeo.Tests
             stencil.Count().ShouldEqual(1);
             var complexNeg = stencil.Single() as ComplexNegative<BlogTemplate, BlogPost>;
             complexNeg.Spaces.Count().ShouldEqual(3);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_creates_spaces_for_simple_inside_block_surrounded_by_many_chars()
+        {
+            const string template = "{Posts}...{Post.Title}...{/Posts}";
+            IInputParser inputParser = new ManualInputParser();
+            var stencil = inputParser.Parse(_builder.Token, template);
+
+            stencil.Count().ShouldEqual(1);
+            var complexNeg = stencil.Single() as ComplexNegative<BlogTemplate, BlogPost>;
+            complexNeg.Spaces.Count().ShouldEqual(3);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_creates_spaces_for_simple_inside_adjacent_block_surrounded_by_many_chars()
+        {
+            const string template = "{Posts}...{Post.Title}...{/Posts}{Posts}...{Post.Title}...{/Posts}";
+            IInputParser inputParser = new ManualInputParser();
+            var stencil = inputParser.Parse(_builder.Token, template);
+
+            stencil.Count().ShouldEqual(2);
+            var complexNeg0 = stencil.ElementAt(0) as ComplexNegative<BlogTemplate, BlogPost>;
+            complexNeg0.Spaces.Count().ShouldEqual(3);
+            var complexNeg1 = stencil.ElementAt(1) as ComplexNegative<BlogTemplate, BlogPost>;
+            complexNeg1.Spaces.Count().ShouldEqual(3);
         }
     }
 }

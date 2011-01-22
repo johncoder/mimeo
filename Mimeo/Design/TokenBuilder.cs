@@ -90,7 +90,7 @@ namespace Mimeo.Design
             {
                 Resolve = p => string.Empty,
                 Identifier = string.Intern(identifier),
-                Items = item => GetEachChild(item, children)
+                Items = model => GetEachChild(model, children)
             };
 
             _currentToken = blockToken;
@@ -102,10 +102,20 @@ namespace Mimeo.Design
             return new TokenBlockBuilder<TModel, TChild>(_currentToken);
         }
 
-        private IEnumerable<object> GetEachChild<TChild>(TModel item, Func<TModel, IEnumerable<TChild>> children)
+        private IEnumerable<object> GetEachChild<TChild>(TModel model, Func<TModel, IEnumerable<TChild>> children)
         {
-            foreach (var child in children(item))
-                yield return child;
+            var items = children(model);
+
+            if (items == null)
+                yield break;
+
+            foreach (var child in children(model))
+            {
+                if (child != null)
+                    yield return child;
+                else
+                    yield break;
+            }
         }
 
         public IConditionalToken<TModel, TChild> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Func<TModel, bool> condition)
