@@ -11,6 +11,7 @@ namespace Mimeo
     public abstract class Mimeo
     {
         public abstract string Render(string name, object obj);
+        public abstract IStencil CreateStencil(string name, string template);
     }
 
     public class Mimeo<TModel> : Mimeo, IMimeo<TModel>
@@ -33,7 +34,7 @@ namespace Mimeo
             configureBuilder(Builder);
         }
 
-        public IStencil CreateStencil(string name, string template)
+        public override IStencil CreateStencil(string name, string template)
         {
             if (Stencils.ContainsKey(name))
                 return Stencils[name];
