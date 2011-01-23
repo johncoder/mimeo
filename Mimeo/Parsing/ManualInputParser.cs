@@ -68,11 +68,6 @@ namespace Mimeo.Parsing
                 _currentPosition++;
             }
             
-            //if (newStencil == null && stringBuilder.Length > 0)
-            //{
-            //    AddSpace(stencil, newStencil, new Positive(stringBuilder.ToString()));
-            //}
-
             if (_template.Length - _currentPosition >= 0 && stringBuilder.Length > 0)
                 AddSpace(stencil, newStencil, new Positive(stringBuilder.ToString()));
 
