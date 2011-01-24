@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
+using System.Text;
 using Mimeo.Design;
 using Mimeo.Design.Syntax;
 using Mimeo.Parsing;
@@ -15,25 +13,23 @@ namespace Mimeo.Tests
     public class ManualInputParserTest
     {
         private ITokenRoot<BlogTemplate> _builder;
-        private string _template;
 
         [SetUp]
         public void SetUp()
         {
-            _template = File.ReadAllText(Assembly.GetExecutingAssembly().Location.Replace("Mimeo.Tests.dll", "TestData\\Sample1.txt"));
-
             _builder = new TokenBuilder<BlogTemplate>();
             _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
             _builder.Tokenize(b => b.JavaScriptIncludes, @"{JavaScriptIncludes}");
             _builder.TokenizeIf(b => b.Post, @"{Post}", b => b.Post != null, ctx => {
-                    ctx.Tokenize(b => b.PostTitle, @"{Title}");
-                    ctx.Tokenize(b => b.PostDescription, @"{Description}");
+                    ctx.Tokenize(b => b.PostTitle, @"{PostTitle}");
+                    ctx.Tokenize(b => b.PostDescription, @"{PostDescription}");
                     ctx.Tokenize(b => b.PostBody, @"{PostBody}");
-                    ctx.Block(d => d.Comments, @"{Comments}", commentContext => {
-                            commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
-                            commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
-                            commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
-                        }).EndsWith(@"{/Comments}");
+                    ctx.Block(d => d.Comments, @"{Comments}", commentContext =>
+                    {
+                        commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
+                        commentContext.Tokenize(c => c.Author, @"{Comment.Author}");
+                        commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
+                    }).EndsWith(@"{/Comments}");
                 }).EndsWith(@"{/Post}");
             _builder.Block(b => b.Posts, @"{Posts}", postContext => {
                     postContext.Tokenize(d => d.PostTitle, @"{Post.Title}");
@@ -47,15 +43,6 @@ namespace Mimeo.Tests
                             commentContext.Tokenize(c => c.Text, @"{Comment.Text}");
                         }).EndsWith(@"{/Comments}");
                 }).EndsWith(@"{/Posts}");
-        }
-
-        [Test]
-        public void FileReadingTest()
-        {
-            _template.ShouldNotBeNull();
-            _template.ShouldNotBeEmpty();
-            (_template.Length > 10).ShouldBeTrue();
-            Debug.WriteLine(_template);
         }
 
         [Test]
@@ -75,16 +62,6 @@ namespace Mimeo.Tests
             var stencil = inputParser.Parse(_builder.Token, "asdf");
             stencil.Count().ShouldEqual(1);
             stencil.Single().ShouldBeType<Positive>();
-        }
-
-        [Test]
-        public void ManualInputParser_should_return_several_tokenmatches()
-        {
-            IInputParser inputParser = new ManualInputParser();
-
-            var stencil = inputParser.Parse(_builder.Token, _template);
-
-            stencil.Any().ShouldBeTrue();
         }
 
         [Test]
@@ -172,6 +149,22 @@ namespace Mimeo.Tests
         }
 
         [Test]
+        public void ManualInputParser_Parse_block_gets_nested_simple_negative()
+        {
+            const string template = @"{Post}{PostTitle}{/Post}";
+            IInputParser inputParser = new ManualInputParser();
+
+            var stencil = inputParser.Parse(_builder.Token, template);
+
+            stencil.Count().ShouldEqual(1);
+            var cn = stencil.ElementAt(0) as ComplexNegative<BlogTemplate, BlogPost>;
+            cn.Spaces.Single().ShouldBeType<SimpleNegative>();
+            var sb = new StringBuilder();
+            cn.Spaces.First().GetContents(new BlogPost { PostTitle = "asdf" }, sb);
+            sb.ToString().ShouldEqual("asdf");
+        }
+
+        [Test]
         public void ManualInputParser_Parse_block_creates_complex_nested_complex()
         {
             const string template = @"{Post}{Comments}...{/Comments}{/Post}";
@@ -214,18 +207,6 @@ namespace Mimeo.Tests
             var element2 = stencil.ElementAt(2) as Positive;
             element2.ShouldNotBeNull();
             element2.Value.ShouldEqual("....");
-        }
-
-        [Test]
-        public void Try_ManualInputParser_on_template_read_from_file()
-        {
-            IInputParser inputParser = new ManualInputParser();
-
-            var stencil = inputParser.Parse(_builder.Token, _template);
-
-            stencil.Count().ShouldEqual(9);
-            var last = stencil.Last() as Positive;
-            last.Value.ToCharArray().ShouldEqual(_template.Reverse().Take(last.Value.Length).Reverse().ToArray());
         }
 
         [Test]

@@ -1,0 +1,25 @@
+﻿<html>
+	<head>
+	    <title>{PageTitle}</title>
+        {JavaScriptIncludes}
+	</head>
+	<body>{Post}
+		<div class="main">
+			<h1>{PostTitle}</h1>
+			<p>{PostDescription}</p>
+			<p>{PostBody}</p>
+			<div class="comments">{Comments}
+				<div class="comment">
+					<span class="text">{CommentText}</span>
+				</div>
+			{/Comments}</div>
+		</div>{/Post}
+		<div class="">{Posts}
+			<div class="">
+				<h2>{PostTitle}</h2>
+				<p>{PostDescription}</p>
+				<p>{PostBody}</p>
+			</div>{/Posts}
+		</div>
+	</body>
+</html>

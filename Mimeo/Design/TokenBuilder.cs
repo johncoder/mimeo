@@ -55,6 +55,7 @@ namespace Mimeo.Design
 
             var blockToken = new BlockToken<TModel, TChild>
             {
+                Child = replacement,
                 Resolve = p => string.Empty,
                 Identifier = string.Intern(identifier),
                 Condition = condition

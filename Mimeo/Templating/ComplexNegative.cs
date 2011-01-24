@@ -30,8 +30,48 @@ namespace Mimeo.Templating
 
             if (!CanHandle(model))
                 return;
+            var obj = _token.GetChild(model);
+            var objs = _token.Items((TModel) model);
 
-            foreach (var item in _token.Items((TModel)model))
+            if (!objs.Any() && obj != null)
+            {
+                foreach (var space in _spaces)
+                {
+                    if (space.CanHandle(obj))
+                    {
+                        if (space.ShouldHandle(obj))
+                        {
+                            space.GetContents(obj, stringBuilder);
+                            continue;
+                        }
+                    }
+                    else if (_token.CanHandle(obj))
+                    {
+                        stringBuilder.Append(_token.GetValue(obj));
+                        continue;
+                    }
+                    else if (_token.Children.Any(c => c.CanHandle(obj)))
+                    {
+                        foreach (var child in _token.Children)
+                            if (child.CanHandle(obj))
+                            {
+                                stringBuilder.Append(child.GetValue(obj));
+                                break;
+                            }
+                        continue;
+                    }
+                    else
+                    {
+                        if (space.CanHandle(obj) && space.ShouldHandle(obj))
+                        {
+                            space.GetContents(obj, stringBuilder);
+                            continue;
+                        }
+                    }
+                }
+            }
+            else
+            foreach (var item in objs)
             {
                 foreach (var space in _spaces)
                 {

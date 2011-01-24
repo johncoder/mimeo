@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using NUnit.Framework;
 using Should;
 
@@ -16,6 +17,11 @@ namespace Mimeo.Tests
                 b.Tokenize(p => p.BlogTitle, "{BlogTitle}");
                 b.Tokenize(p => p.PageTitle, "{PageTitle}");
                 b.Tokenize(p => p.JavaScriptIncludes, "{JavaScriptIncludes}");
+                b.TokenizeIf(p => p.Post, "{Post}", p => p.Post != null, block => {
+                    block.Tokenize(p => p.PostTitle, "{PostTitle}");
+                    block.Tokenize(p => p.PostDescription, "{PostDescription}");
+                    block.Tokenize(p => p.PostBody, "{PostBody}");
+                }).EndsWith("{/Post}");
                 b.Block(p => p.Posts, "{Posts}", block => {
                     block.Tokenize(p => p.PostTitle, "{PostTitle}");
                     block.Tokenize(p => p.PostDescription, "{PostDescription}");
@@ -57,6 +63,16 @@ namespace Mimeo.Tests
             _mimeo.CreateStencil("newtemplate", template);
 
             _mimeo.Render("newtemplate", new BlogTemplate { BlogTitle = "ASDF" }).ShouldEqual("asdfASDFasdf");
+        }
+
+        [Test]
+        public void Stencil_GetContents_handles_block_with_simple_replacement()
+        {
+            const string template = "{Post}{PostTitle}{/Post}";
+            var stencil = _mimeo.CreateStencil("newtemplate", template);
+            var blog = new BlogTemplate { Post = new BlogPost { PostTitle = "asdf" } };
+            var result = _mimeo.Render("newtemplate", blog);
+            result.ShouldEqual("asdf");
         }
 
         [Test]

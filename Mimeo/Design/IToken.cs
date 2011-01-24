@@ -17,6 +17,7 @@ namespace Mimeo.Design
         void AddChild(IToken token);
         Space CreateSpace();
         Space CreateSpace(IEnumerable<Space> spaces);
+        object GetChild(object obj);
     }
 
     public interface IToken<TModel> : IToken

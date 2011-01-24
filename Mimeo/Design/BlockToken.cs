@@ -7,6 +7,14 @@ namespace Mimeo.Design
     public class BlockToken<TModel, TChild> : Token<TModel>, IBlockToken<TModel, TChild>
     {
         public Func<TModel, IEnumerable<object>> Items { get; set; }
+        public Func<TModel, TChild> Child { get; set; }
+
+        public override object GetChild(object obj)
+        {
+            if (Child == null) return null;
+
+            return Child((TModel)obj);
+        }
 
         public BlockToken()
         {

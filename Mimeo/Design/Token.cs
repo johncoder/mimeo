@@ -47,6 +47,11 @@ namespace Mimeo.Design
             return Resolve(model);
         }
 
+        public virtual object GetChild(object obj)
+        {
+            return null;
+        }
+
 	    public bool CanHandle(object obj)
 	    {
 	        return obj is TModel;

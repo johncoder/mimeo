@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<BlogTemplate>
+  <PageTitle>Hello, World!</PageTitle>
+  <BlogTitle>johncoder</BlogTitle>
+  <JavaScriptIncludes><![CDATA[<script type="text/javascript" src="jquery.js"></script>]]></JavaScriptIncludes>
+  <Post>
+    <PostTitle>First Post</PostTitle>
+    <PostDescription>This is the first post, and I apologize if there is little to no valuable content within.</PostDescription>
+    <PostBody>This is the body of the post, indicating that there should be some length and content available to parse and read out. It would be nice to perhaps include some Lorem Ipsum in the mix, but I think that babbling and barfing text in to the text editor is more fun and entertaining.</PostBody>
+    <PostedOn>1997-11-07T00:00:00</PostedOn>
+    <Comments>
+      <Comment>
+        <Text>More Hello, World!</Text>
+      </Comment>
+    </Comments>
+  </Post>
+  <Posts>
+    <PostTitle>First Post</PostTitle>
+    <PostDescription>This is the first post, and I apologize if there is little to no valuable content within.</PostDescription>
+    <PostBody>This is the body of the post, indicating that there should be some length and content available to parse and read out. It would be nice to perhaps include some Lorem Ipsum in the mix, but I think that babbling and barfing text in to the text editor is more fun and entertaining.</PostBody>
+    <PostedOn>1997-11-07T00:00:00</PostedOn>
+    <Comments>
+      <Comment>
+        <Text>More Hello, World!</Text>
+      </Comment>
+    </Comments>
+  </Posts>
+</BlogTemplate>
