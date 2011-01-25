@@ -8,12 +8,12 @@ namespace Mimeo.Tests
     [TestFixture]
     public class StencilTests
     {
-        private Mimeo<BlogTemplate> _mimeo;
+        private Mimeograph<BlogTemplate> _mimeo;
 
         [SetUp]
         public void SetUp()
         {
-            _mimeo = new Mimeo<BlogTemplate>(b => {
+            _mimeo = new Mimeograph<BlogTemplate>(b => {
                 b.Tokenize(p => p.BlogTitle, "{BlogTitle}");
                 b.Tokenize(p => p.PageTitle, "{PageTitle}");
                 b.Tokenize(p => p.JavaScriptIncludes, "{JavaScriptIncludes}");

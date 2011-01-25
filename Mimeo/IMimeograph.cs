@@ -4,7 +4,7 @@ using Mimeo.Templating;
 
 namespace Mimeo
 {
-    public interface IMimeo<TModel>
+    public interface IMimeograph<TModel>
     {
         IInputParser Parser { get; set; }
         ITokenRoot<TModel> Builder { get; set; }

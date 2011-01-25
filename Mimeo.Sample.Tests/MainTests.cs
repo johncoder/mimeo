@@ -83,7 +83,7 @@ namespace Mimeo.Sample.Tests
         private void ConfigureMimeographs()
         {
             _mimeographs = new Mimeographs();
-            var blogTemplateMimeo = new Mimeo<BlogTemplate>(b =>
+            var blogTemplateMimeo = new Mimeograph<BlogTemplate>(b =>
             {
                 b.Tokenize(p => p.BlogTitle, "{BlogTitle}");
                 b.Tokenize(p => p.PageTitle, "{PageTitle}");

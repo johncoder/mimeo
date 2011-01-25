@@ -8,24 +8,24 @@ using Mimeo.Templating;
 
 namespace Mimeo
 {
-    public abstract class Mimeo
+    public abstract class Mimeograph
     {
         public abstract string Render(string name, object obj);
         public abstract IStencil CreateStencil(string name, string template);
     }
 
-    public class Mimeo<TModel> : Mimeo, IMimeo<TModel>
+    public class Mimeograph<TModel> : Mimeograph, IMimeograph<TModel>
     {
         private IDictionary<string, IStencil> Stencils { get; set; }
 
         public ITokenRoot<TModel> Builder { get; set; }
         public IInputParser Parser { get; set; }
 
-        public Mimeo() : this(b => {}, new ManualInputParser()) { }
+        public Mimeograph() : this(b => {}, new ManualInputParser()) { }
 
-        public Mimeo(Action<ITokenRoot<TModel>> configureBuilder) : this(configureBuilder, new ManualInputParser()) { }
+        public Mimeograph(Action<ITokenRoot<TModel>> configureBuilder) : this(configureBuilder, new ManualInputParser()) { }
 
-        public Mimeo(Action<ITokenRoot<TModel>> configureBuilder, IInputParser parser)
+        public Mimeograph(Action<ITokenRoot<TModel>> configureBuilder, IInputParser parser)
         {
             Stencils = new Dictionary<string, IStencil>();
             Parser = parser;

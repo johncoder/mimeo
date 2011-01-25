@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace Mimeo
 {
-    public class Mimeographs : Dictionary<Type, Mimeo>
+    public class Mimeographs : Dictionary<Type, Mimeograph>
     {
-        public void Add<TModel>(Mimeo<TModel> mimeo)
+        public void Add<TModel>(Mimeograph<TModel> mimeo)
         {
             Add(typeof(TModel), mimeo);
         }
 
-        public string Render<TModel>(string name, TModel model)
+        public string Render(string name, object model)
         {
-            return this[typeof(TModel)].Render(name, model);
+            return this[model.GetType()].Render(name, model);
         }
 
         public void CreateStencil<TModel>(string name, string template)
