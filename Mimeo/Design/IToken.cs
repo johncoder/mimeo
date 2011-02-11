@@ -8,7 +8,7 @@ namespace Mimeo.Design
     {
         string Identifier { get; set; }
         string Terminator { get; set; }
-        string GetValue(object obj);
+        string Evaluate(object obj);
         bool CanHandle(object obj);
         bool ShouldHandle(object obj);
         ICollection<IToken> Children { get; set; }
@@ -18,6 +18,7 @@ namespace Mimeo.Design
         Space CreateSpace();
         Space CreateSpace(IEnumerable<Space> spaces);
         object GetChild(object obj);
+        InterpolationData Interpolation { get; set; }
     }
 
     public interface IToken<TModel> : IToken
@@ -34,6 +35,5 @@ namespace Mimeo.Design
 
     public interface IBlockToken<TModel, out TChild> : IBlockToken<TModel>
     {
-
     }
 }

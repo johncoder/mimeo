@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Design\BlockToken.cs" />
+    <Compile Include="Design\InterpolationData.cs" />
+    <Compile Include="Design\InterpolationToken.cs" />
     <Compile Include="Design\IToken.cs" />
     <Compile Include="Design\Syntax\IFluentSyntax.cs" />
     <Compile Include="Design\Syntax\ITokenRoot.cs" />
@@ -59,6 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Templating\ComplexNegative.cs" />
     <Compile Include="Templating\ComplexNegativeFactory.cs" />
+    <Compile Include="Templating\InterpolatingSpace.cs" />
     <Compile Include="Templating\IStencil.cs" />
     <Compile Include="Templating\Positive.cs" />
     <Compile Include="Templating\SimpleNegative.cs" />

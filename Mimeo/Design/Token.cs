@@ -13,8 +13,9 @@ namespace Mimeo.Design
         public Func<TModel, bool> Condition { get; set; }
         public ICollection<IToken> Children { get; set; }
 	    public IToken Parent { get; set; }
+        public InterpolationData Interpolation { get; set; }
 
-	    public Token()
+        public Token()
 	    {
 	        Children = new List<IToken>();
 	    }
@@ -34,7 +35,7 @@ namespace Mimeo.Design
             Children.Add(token);
         }
 
-        public virtual string GetValue(object obj)
+        public virtual string Evaluate(object obj)
         {
             return GetValue((TModel)obj);
         }

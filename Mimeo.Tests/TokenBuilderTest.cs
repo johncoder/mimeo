@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Mimeo.Design.Syntax;
 using NUnit.Framework;
@@ -71,6 +72,15 @@ namespace Mimeo.Tests
             _builder.Token.Children.Count().ShouldEqual(1);
             _builder.Token.Children.First().Terminator.ShouldNotBeNull();
             _builder.Token.Children.First().Terminator.ShouldEqual(@"{/Posts}");
+        }
+
+        [Test]
+        public void Calling_Interpolate_parses_token()
+        {
+            _builder.Interpolate("{ContentPage('", ".*", "')}", data => "success");
+            var token = _builder.Token.Children.First();
+            token.ShouldBeType<InterpolationToken<BlogTemplate>>();
+            token.Interpolation.ShouldNotBeNull();
         }
     }
 }

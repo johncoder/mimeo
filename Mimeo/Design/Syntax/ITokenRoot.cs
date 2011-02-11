@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Mimeo.Design.Syntax
 {
@@ -8,6 +9,8 @@ namespace Mimeo.Design.Syntax
 
     public interface ITokenRoot<TModel> : ITokenSyntax
     {
+        ISimpleToken<TModel> Interpolate(string start, string argumentPattern, string end, Func<dynamic, string> inject);
+        ISimpleToken<TModel> Interpolate(InterpolationData interpolationData);
         ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier);
 
         IConditionalToken<TModel, TChild> TokenizeIf<TChild>(Func<TModel, TChild> replacement, string identifier,

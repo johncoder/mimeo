@@ -1,5 +1,6 @@
 ﻿using Mimeo.Design.Syntax;
 using Mimeo.Internal;
+using System;
 
 namespace Mimeo.Design
 {
@@ -18,6 +19,15 @@ namespace Mimeo.Design
             Ensure.ArgumentNotNullOrEmpty(terminator, "terminator");
 
             _token.Terminator = terminator;
+            return this;
+        }
+
+        public ITokenBlock<TModel, TChild> Interpolate(string start, string end, Func<dynamic, string> inject)
+        {
+            Ensure.ArgumentNotNull(inject, "inject");
+            Ensure.ArgumentNotNullOrEmpty(start, "start");
+            Ensure.ArgumentNotNullOrEmpty(end, "end");
+
             return this;
         }
     }

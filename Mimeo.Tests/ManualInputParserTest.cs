@@ -246,5 +246,24 @@ namespace Mimeo.Tests
             var complexNeg1 = stencil.ElementAt(1) as ComplexNegative<BlogTemplate, BlogPost>;
             complexNeg1.Spaces.Count().ShouldEqual(3);
         }
+
+        [Test]
+        public void ManualInputParser_CurrentIsToken_InterpolationData_parses_correctly()
+        {
+            const string template = "{ContentPage('asdf')}";
+            var interpolationData = new InterpolationData
+                {
+                    Start = "{ContentPage('",
+                    End = "')}",
+                    ArgumentPattern = ".*"
+                };
+
+            var parser = new ManualInputParser();
+            parser.Template = template;
+
+            var result = parser.CurrentIsToken(interpolationData);
+            interpolationData.ArgumentInput.ShouldEqual("asdf");
+            result.ShouldBeTrue();
+        }
     }
 }

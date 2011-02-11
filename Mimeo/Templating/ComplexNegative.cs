@@ -47,7 +47,7 @@ namespace Mimeo.Templating
                     }
                     else if (_token.CanHandle(obj))
                     {
-                        stringBuilder.Append(_token.GetValue(obj));
+                        stringBuilder.Append(_token.Evaluate(obj));
                         continue;
                     }
                     else if (_token.Children.Any(c => c.CanHandle(obj)))
@@ -55,7 +55,7 @@ namespace Mimeo.Templating
                         foreach (var child in _token.Children)
                             if (child.CanHandle(obj))
                             {
-                                stringBuilder.Append(child.GetValue(obj));
+                                stringBuilder.Append(child.Evaluate(obj));
                                 break;
                             }
                         continue;
@@ -85,7 +85,7 @@ namespace Mimeo.Templating
                     }
                     else if (_token.CanHandle(item))
                     {
-                        stringBuilder.Append(_token.GetValue(item));
+                        stringBuilder.Append(_token.Evaluate(item));
                         continue;
                     }
                     else if (_token.Children.Any(c => c.CanHandle(item)))
@@ -93,7 +93,7 @@ namespace Mimeo.Templating
                         foreach (var child in _token.Children)
                             if (child.CanHandle(item))
                             {
-                                stringBuilder.Append(child.GetValue(item));
+                                stringBuilder.Append(child.Evaluate(item));
                                 break;
                             }
                         continue;

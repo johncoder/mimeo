@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Mimeo.Design;
 using Mimeo.Internal;
 using Mimeo.Templating;
@@ -7,12 +8,12 @@ namespace Mimeo.Parsing
 {
     public class ManualInputParser : IInputParser
     {
-        private string _template;
-        private int _currentPosition;
+        public string Template { get; set; }
+        public int CurrentPosition { get; set; }
 
         IStencil IInputParser.Parse(IToken token, string template)
         {
-            _template = template;
+            Template = template;
             return Parse(token);
         }
 
@@ -26,13 +27,14 @@ namespace Mimeo.Parsing
 
         protected IStencil Parse(IToken token, int start = 0, IStencil newStencil = null, string terminator = null)
         {
-            _currentPosition = start;
+            CurrentPosition = start;
+            
             var stencil = new Stencil();
             var stringBuilder = new StringBuilder();
             var lookForTerminator = !string.IsNullOrEmpty(terminator);
             var terminated = false;
             
-            while (_currentPosition < _template.Length - 1)
+            while (CurrentPosition < Template.Length - 1)
             {
                 if (lookForTerminator && CurrentIsToken(terminator))
                 {
@@ -50,29 +52,33 @@ namespace Mimeo.Parsing
                         var s = result.Token.CreateSpace();
                         var ns = new Stencil();
 
-                        Parse(result.Token, _currentPosition, ns, result.Token.Terminator);
+                        Parse(result.Token, CurrentPosition, ns, result.Token.Terminator);
 
                         foreach (var space in ns)
                             s.Add(space);
 
                         AddSpace(stencil, newStencil, s);
                         continue;
+                    case TokenType.Interpolation:
+                        var interpolatingSpace = result.Token.CreateSpace();
+                        AddSpace(stencil, newStencil, interpolatingSpace);
+                        continue;
                     default:
                         continue;
                 }
             }
 
-            if (newStencil == null && _template.Length - 1 == _currentPosition)
+            if (newStencil == null && Template.Length - 1 == CurrentPosition)
             {
-                stringBuilder.Append(_template[_currentPosition]);
-                _currentPosition++;
+                stringBuilder.Append(Template[CurrentPosition]);
+                CurrentPosition++;
             }
             
-            if (_template.Length - _currentPosition >= 0 && stringBuilder.Length > 0)
+            if (Template.Length - CurrentPosition >= 0 && stringBuilder.Length > 0)
                 AddSpace(stencil, newStencil, new Positive(stringBuilder.ToString()));
 
             if (terminated)
-                _currentPosition += terminator.Length;
+                CurrentPosition += terminator.Length;
 
             return stencil;
         }
@@ -86,34 +92,100 @@ namespace Mimeo.Parsing
                     continue;
                 }
 
-                if (CurrentIsToken(child.Identifier))
+                if (child.Interpolation != null && CurrentIsToken(child.Interpolation))
                 {
-                    if (_currentPosition > 0 && stringBuilder.Length > 0)
+                    if (CurrentPosition > 0 && stringBuilder.Length > 0)
                     {
                         stencil.Add(new Positive(stringBuilder.ToString()));
                         stringBuilder.Clear();
                     }
 
-                    _currentPosition += child.Identifier.Length;
+                    CurrentPosition += child.Interpolation.TotalLength;
+
+                    var result = new ProcessTokenResult { Position = CurrentPosition, Type = TokenType.Interpolation, Token = child };
+                    return result;
+                }
+                else if (CurrentIsToken(child.Identifier))
+                {
+                    if (CurrentPosition > 0 && stringBuilder.Length > 0)
+                    {
+                        stencil.Add(new Positive(stringBuilder.ToString()));
+                        stringBuilder.Clear();
+                    }
+
+                    CurrentPosition += child.Identifier.Length;
 
                     if (string.IsNullOrEmpty(child.Terminator))
                     {
-                        var result = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Simple, Token = child };
+                        var result = new ProcessTokenResult { Position = CurrentPosition, Type = TokenType.Simple, Token = child };
                         return result;
                     }
 
-                    var complex = new ProcessTokenResult { Position = _currentPosition, Type = TokenType.Complex, Token = child };
+                    var complex = new ProcessTokenResult { Position = CurrentPosition, Type = TokenType.Complex, Token = child };
                     return complex;
                 }
                 
             }
 
-            char c = _template[_currentPosition];
+            char c = Template[CurrentPosition];
             stringBuilder.Append(c);
-            _currentPosition++;
+            CurrentPosition++;
 
-            var notAToken = new ProcessTokenResult {Type = TokenType.NotAToken, Position = _currentPosition};
+            var notAToken = new ProcessTokenResult {Type = TokenType.NotAToken, Position = CurrentPosition};
             return notAToken;
+        }
+
+        public bool CurrentIsToken(InterpolationData interpolationData)
+        {
+            int step = 0;
+            int end = CurrentPosition + interpolationData.Start.Length;
+
+            if (end > Template.Length)
+                return false;
+
+            int tokenEndPosition = 0;
+            Func<int, bool> isCurrentStartOfEndToken = start =>
+            {
+                int endPosition = 0;
+                for (int j = start; j < Template.Length && endPosition < interpolationData.End.Length; j++)
+                {
+                    if (Template[j] == interpolationData.End[endPosition])
+                    {
+                        endPosition++;
+                        continue;
+                    }
+
+                    return false;
+                }
+                tokenEndPosition = start + endPosition;
+                return true;
+            };
+
+            // completing this loop means that the current position
+            // is the beginning of an interpolation token.
+            for (int i = CurrentPosition; i <= end && step < interpolationData.Start.Length; i++)
+            {
+                if (Template[i] != interpolationData.Start[step])
+                    return false;
+                step++;
+            }
+
+            for (int i = end; i < Template.Length; i++)
+            {
+
+                if (Template[i] == interpolationData.End[0])
+                {
+                    int endPosition = 0;
+                    if (isCurrentStartOfEndToken(i))
+                    {
+                        interpolationData.ArgumentInput = Template.Substring(end, i - end);
+                        break;
+                    }
+                    continue;
+                }
+            }
+            //CurrentPosition = tokenEndPosition;
+            return true;
         }
 
 
@@ -128,6 +200,7 @@ namespace Mimeo.Parsing
         {
             Simple,
             Complex,
+            Interpolation,
             NotAToken
         }
 
@@ -136,14 +209,14 @@ namespace Mimeo.Parsing
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
             int step = 0;
-            int end = _currentPosition + identifier.Length;
+            int end = CurrentPosition + identifier.Length;
 
-            if (end > _template.Length)
+            if (end > Template.Length)
                 return false;
 
-            for (int i = _currentPosition; i < end; i++)
+            for (int i = CurrentPosition; i < end; i++)
             {
-                if (_template[i] != identifier[step])
+                if (Template[i] != identifier[step])
                     return false;
                 step++;
             }

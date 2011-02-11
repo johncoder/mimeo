@@ -188,5 +188,24 @@ namespace Mimeo.Tests
             var result = _mimeo.Render("newtemplate", blog);
             result.ShouldEqual("1 ...hi1 ...hi2 ...hi3 2 3 ");
         }
+
+        [Test]
+        public void Interpolate_replaces_properly_with_different_parameters()
+        {
+            _mimeo.Builder.Interpolate("{ContentPage('", ".*", "')}", data => data.ToString());
+            var stencil = _mimeo.CreateStencil("newtemplate", "{ContentPage('asdf')}{ContentPage('qwerty')}");
+            var sb = new StringBuilder();
+            stencil.GetContents(new object(), sb);
+            sb.ToString().ShouldEqual("asdfqwerty");
+        }
+
+        [Test]
+        public void Interpolate_replaces_with_simple_negative()
+        {
+            _mimeo.Builder.Interpolate("{ContentPage('", ".*", "')}", data => data.ToString());
+            _mimeo.CreateStencil("newtemplate", "{BlogTitle} {ContentPage('asdf')} {ContentPage('qwerty')}");
+            var result = _mimeo.Render("newtemplate", new BlogTemplate { BlogTitle = "My Blog" });
+            result.ShouldEqual("My Blog asdf qwerty");
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Mimeo.Design.Syntax;
 using Mimeo.Internal;
 
@@ -17,6 +18,38 @@ namespace Mimeo.Design
             Token = token;
             if (token.Resolve == null)
                 token.Resolve = p => string.Empty;
+        }
+
+        public ISimpleToken<TModel> Interpolate(string start, string argumentPattern, string end, Func<dynamic, string> inject)
+        {
+            Ensure.ArgumentNotNullOrEmpty(start, "start");
+            Ensure.ArgumentNotNullOrEmpty(end, "end");
+            Ensure.ArgumentNotNull(inject, "inject");
+
+            var interpolationData = new InterpolationData
+            {
+                Start = start,
+                ArgumentPattern = argumentPattern,
+                End = end,
+                Injection = inject
+            };
+
+            return Interpolate(interpolationData);
+        }
+
+        public ISimpleToken<TModel> Interpolate(InterpolationData interpolationData)
+        {
+            Ensure.ArgumentNotNull(interpolationData, "interpolationData");
+
+            _currentToken = new InterpolationToken<TModel>()
+            {
+                Interpolation = interpolationData,
+                //Resolve = interpolationData.CreateValueDelegate<TModel>(),
+                Identifier = interpolationData.GetIdentifier()
+            };
+            Token.AddChild(_currentToken);
+
+            return this;
         }
 
         public ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier)
@@ -135,22 +168,6 @@ namespace Mimeo.Design
 
             return new TokenBlockBuilder<TModel, TChild>(_currentToken);
         }
-
-        //public ITokenBlock<TModel, TChild> Tokenize<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier)
-        //{
-        //    Ensure.ArgumentNotNull(children, "children");
-        //    Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
-
-        //    _currentToken = new BlockToken<TModel, TChild>
-        //    {
-        //        Resolve = p => string.Empty,
-        //        Identifier = identifier,
-        //        Items = item => GetEachChild(item, children)
-        //    };
-        //    Token.Children.Add(_currentToken);
-
-        //    return new TokenBlockBuilder<TModel, TChild>(_currentToken);
-        //}
 
         public ISimpleToken<TModel> Encode(bool shouldEncode)
         {

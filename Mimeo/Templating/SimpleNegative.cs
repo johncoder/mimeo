@@ -32,7 +32,7 @@ namespace Mimeo.Templating
                 if (!child.CanHandle(model))
                     continue;
                 
-                stringBuilder.Append(child.GetValue(model));
+                stringBuilder.Append(child.Evaluate(model));
                 return;
             }
 
@@ -46,7 +46,7 @@ namespace Mimeo.Templating
 
             if (token != null && token.CanHandle(model))
             {
-                stringBuilder.Append(_token.GetValue(model));
+                stringBuilder.Append(_token.Evaluate(model));
                 return;
             }
 		}
