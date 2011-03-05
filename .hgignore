@@ -5,3 +5,5 @@ glob:*.suo
 glob:*.csproj.user
 glob:_ReSharper*
 glob:*.ReSharper.user
+glob:build
+glob:tools/*.log

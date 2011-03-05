@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>Mimeo</id>
+    <version>1.0.0.0</version>
+    <authors>John Nelson</authors>
+    <language>en-US</language>
+    <description>A templating library for creating your own templating language, and binding a CLR object to that template.</description>
+  </metadata>
+  <files>
+    <file src="..\..\build\Mimeo.dll" target="lib\Net40" />
+    <file src="..\..\build\Mimeo.xml" target="lib\Net40" />
+  </files>
+</package>

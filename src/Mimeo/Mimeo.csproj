@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Mimeo.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Mimeo.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -69,8 +71,21 @@
     <Compile Include="Templating\SpaceType.cs" />
     <Compile Include="Templating\Stencil.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Mimeo.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>mkdir "$(SolutionDir)..\build\nuget"
+
+copy "$(TargetDir)Mimeo.dll" "$(SolutionDir)..\build"
+copy "$(TargetDir)Mimeo.xml" "$(SolutionDir)..\build"
+
+"$(SolutionDir)..\tools\NuspecUpdater.exe" $(TargetDir)Mimeo.dll $(ProjectDir)Mimeo.nuspec
+
+"$(SolutionDir)..\tools\nuget.exe" pack "$(ProjectDir)Mimeo.nuspec" /o "$(SolutionDir)..\build\nuget"
+</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
