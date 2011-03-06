@@ -6,14 +6,31 @@ using Mimeo.Internal;
 
 namespace Mimeo.Templating
 {
+    /// <summary>
+    /// A space representing a collection of child spaces to be rendered.
+    /// </summary>
+    /// <typeparam name="TModel"></typeparam>
+    /// <typeparam name="TChild"></typeparam>
     public class ComplexNegative<TModel, TChild> : Space
     {
         private readonly ICollection<Space> _spaces;
         private readonly IBlockToken<TModel> _token;
 
+        /// <summary>
+        /// Child spaces to be rendered.
+        /// </summary>
         public ICollection<Space> Spaces { get { return _spaces; } }
+
+        /// <summary>
+        /// The token that represents the current space.
+        /// </summary>
         public IBlockToken<TModel> Token { get { return _token; } }
 
+        /// <summary>
+        /// Initializes the complex negative space.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="spaces"></param>
         public ComplexNegative(IBlockToken<TModel> token, IEnumerable<Space> spaces)
         {
             Ensure.ArgumentNotNull(token, "token");
@@ -23,6 +40,11 @@ namespace Mimeo.Templating
             _spaces = spaces.ToList();
         }
 
+        /// <summary>
+        /// Gets the contents of the space using the model.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="stringBuilder"></param>
         public override void GetContents(object model, StringBuilder stringBuilder)
         {
             Ensure.ArgumentNotNull(model, "model");
@@ -110,17 +132,31 @@ namespace Mimeo.Templating
             }
         }
 
+        /// <summary>
+        /// Adds a space to the collection of spaces.
+        /// </summary>
+        /// <param name="obj"></param>
         public override void Add(object obj)
         {
             Ensure.ArgumentNotNull(obj, "obj");
             Spaces.Add(obj as Space);
         }
 
+        /// <summary>
+        /// Determines whether or not the space can handle the object.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public override bool CanHandle(object model)
         {
             return _token.CanHandle(model);
         }
 
+        /// <summary>
+        /// Determines whether or not the space should handle the object.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public override bool ShouldHandle(object model)
         {
             return _token.ShouldHandle(model);

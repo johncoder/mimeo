@@ -6,11 +6,27 @@ using Mimeo.Templating;
 
 namespace Mimeo.Parsing
 {
+    /// <summary>
+    /// Manually parses a template to produce a stencil.
+    /// </summary>
     public class ManualInputParser : IInputParser
     {
+        /// <summary>
+        /// The template used to produce a stencil.
+        /// </summary>
         public string Template { get; set; }
+
+        /// <summary>
+        /// Gets the current position of the template while it is parsing.
+        /// </summary>
         public int CurrentPosition { get; set; }
 
+        /// <summary>
+        /// Parses the template using the token graph, and produces a stencil.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
         IStencil IInputParser.Parse(IToken token, string template)
         {
             Template = template;
@@ -25,6 +41,14 @@ namespace Mimeo.Parsing
                 current.Add(space);
         }
 
+        /// <summary>
+        /// Parses a sectino of the template, accumulating spaces to be used in the stencil.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <param name="start"></param>
+        /// <param name="newStencil"></param>
+        /// <param name="terminator"></param>
+        /// <returns></returns>
         protected IStencil Parse(IToken token, int start = 0, IStencil newStencil = null, string terminator = null)
         {
             CurrentPosition = start;
@@ -135,6 +159,11 @@ namespace Mimeo.Parsing
             return notAToken;
         }
 
+        /// <summary>
+        /// Determines whether or not the current position in the template represents a token.
+        /// </summary>
+        /// <param name="interpolationData"></param>
+        /// <returns></returns>
         public bool CurrentIsToken(InterpolationData interpolationData)
         {
             int step = 0;
@@ -175,7 +204,6 @@ namespace Mimeo.Parsing
 
                 if (Template[i] == interpolationData.End[0])
                 {
-                    int endPosition = 0;
                     if (isCurrentStartOfEndToken(i))
                     {
                         interpolationData.ArgumentInput = Template.Substring(end, i - end);
@@ -184,26 +212,61 @@ namespace Mimeo.Parsing
                     continue;
                 }
             }
-            //CurrentPosition = tokenEndPosition;
             return true;
         }
 
-
+        /// <summary>
+        /// A result of processing a token.
+        /// </summary>
         public class ProcessTokenResult
         {
+            /// <summary>
+            /// The position that the token appears.
+            /// </summary>
             public int Position { get; set; }
+
+            /// <summary>
+            /// The type of the current token.
+            /// </summary>
             public TokenType Type { get; set; }
+
+            /// <summary>
+            /// The token that was found.
+            /// </summary>
             public IToken Token { get; set; }
         }
 
+        /// <summary>
+        /// Types of tokens for parsing.
+        /// </summary>
         public enum TokenType
         {
+            /// <summary>
+            /// A simple token.
+            /// </summary>
             Simple,
+
+            /// <summary>
+            /// A complex token that requires parsing of child tokens.
+            /// </summary>
             Complex,
+
+            /// <summary>
+            /// A token whose value will be interpolated.
+            /// </summary>
             Interpolation,
+
+            /// <summary>
+            /// A non-token.
+            /// </summary>
             NotAToken
         }
 
+        /// <summary>
+        /// Determines whether or not the current position represents a token.
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
         public bool CurrentIsToken(string identifier)
         {
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");

@@ -151,7 +151,7 @@ namespace Mimeo.Sample.Tests
                 {
                     actualOutput.ShouldEqual(expectedOutput);
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
                     // log exception
                     success = false;

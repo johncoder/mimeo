@@ -195,7 +195,7 @@ namespace Mimeo.Tests
             _mimeo.Builder.Interpolate("{ContentPage('", ".*", "')}", data => data.ToString());
             var stencil = _mimeo.CreateStencil("newtemplate", "{ContentPage('asdf')}{ContentPage('qwerty')}");
             var sb = new StringBuilder();
-            stencil.GetContents(new object(), sb);
+            stencil.Render(new object(), sb);
             sb.ToString().ShouldEqual("asdfqwerty");
         }
 
