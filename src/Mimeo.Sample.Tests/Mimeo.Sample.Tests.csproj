@@ -72,6 +72,7 @@
   <ItemGroup>
     <Content Include="TestInput\BlogTemplate1.data.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="TestInput\BlogTemplate1.template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

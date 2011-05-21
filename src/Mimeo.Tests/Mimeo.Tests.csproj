@@ -58,6 +58,7 @@
     <Compile Include="FakeDomain.cs" />
     <Compile Include="ManualInputParserTest.cs" />
     <Compile Include="StencilTests.cs" />
+    <Compile Include="StreamHelper.cs" />
     <Compile Include="TokenBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,3 +1,4 @@
+using System.IO;
 using Mimeo.Design;
 using Mimeo.Templating;
 
@@ -14,6 +15,6 @@ namespace Mimeo.Parsing
         /// <param name="token"></param>
         /// <param name="template"></param>
         /// <returns></returns>
-        IStencil Parse(IToken token, string template);
+        IStencil Parse(IToken token, Stream template);
     }
 }

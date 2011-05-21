@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Mimeo.Design;
 using Mimeo.Design.Syntax;
@@ -20,6 +21,14 @@ namespace Mimeo
         /// <param name="obj"></param>
         /// <returns></returns>
         public abstract string Render(string name, object obj);
+
+        /// <summary>
+        /// Creates a stencil with a name using the template.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
+        public abstract IStencil CreateStencil(string name, Stream template);
 
         /// <summary>
         /// Creates a stencil with a name using the template.
@@ -74,12 +83,17 @@ namespace Mimeo
         }
 
         /// <summary>
-        /// Creates a stencil with a name.
+        /// Renders an object with a specific stencil.
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="template"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        public override IStencil CreateStencil(string name, string template)
+        public override string Render(string name, object obj)
+        {
+            return Render(name, (TModel)obj);
+        }
+
+        public override IStencil CreateStencil(string name, Stream template)
         {
             if (Stencils.ContainsKey(name))
                 return Stencils[name];
@@ -94,15 +108,12 @@ namespace Mimeo
             return stencil;
         }
 
-        /// <summary>
-        /// Renders an object with a specific stencil.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override string Render(string name, object obj)
+        public override IStencil CreateStencil(string name, string template)
         {
-            return Render(name, (TModel)obj);
+            using (var ms = new MemoryStream(Encoding.Default.GetBytes(template)))
+            {
+                return CreateStencil(name, ms);
+            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using Mimeo.Design.Syntax;
+﻿using System.IO;
+using Mimeo.Design.Syntax;
 using Mimeo.Parsing;
 using Mimeo.Templating;
 
@@ -26,7 +27,7 @@ namespace Mimeo
         /// <param name="name"></param>
         /// <param name="template"></param>
         /// <returns></returns>
-        IStencil CreateStencil(string name, string template);
+        IStencil CreateStencil(string name, Stream template);
 
         /// <summary>
         /// Renders an object using a specified stencil by name.

@@ -40,7 +40,9 @@ namespace Mimeo.Tests
         {
             const string template = "asdfasdf";
 
-            _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
 
             _mimeo.Render("newtemplate", new BlogTemplate()).ShouldEqual("asdfasdf");
         }
@@ -50,7 +52,9 @@ namespace Mimeo.Tests
         {
             const string template = "{BlogTitle}";
 
-            _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
 
             _mimeo.Render("newtemplate", new BlogTemplate{BlogTitle = "asdf"}).ShouldEqual("asdf");
         }
@@ -60,7 +64,9 @@ namespace Mimeo.Tests
         {
             const string template = "asdf{BlogTitle}asdf";
 
-            _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
 
             _mimeo.Render("newtemplate", new BlogTemplate { BlogTitle = "ASDF" }).ShouldEqual("asdfASDFasdf");
         }
@@ -69,7 +75,9 @@ namespace Mimeo.Tests
         public void Stencil_GetContents_handles_block_with_simple_replacement()
         {
             const string template = "{Post}{PostTitle}{/Post}";
-            var stencil = _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            var stencil = _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
             var blog = new BlogTemplate { Post = new BlogPost { PostTitle = "asdf" } };
             var result = _mimeo.Render("newtemplate", blog);
             result.ShouldEqual("asdf");
@@ -79,7 +87,9 @@ namespace Mimeo.Tests
         public void Stencil_GetContents_handles_block()
         {
             const string template = "{Posts}.{/Posts}";
-            _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
             var blog = new BlogTemplate { Posts = new List<BlogPost> { new BlogPost(), new BlogPost(), new BlogPost() } };
             var result = _mimeo.Render("newtemplate", blog);
             result.ShouldEqual("...");
@@ -90,7 +100,9 @@ namespace Mimeo.Tests
         {
             const string template = "{Posts}.{PostTitle}.{/Posts}";
 
-            var stencil = _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            var stencil = _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
 
             var blog = new BlogTemplate
             {
@@ -111,7 +123,9 @@ namespace Mimeo.Tests
         {
             const string template = "{Posts}{PostTitle} {Comments}...{/Comments}{/Posts}";
 
-            var stencil = _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            var stencil = _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
 
             var blog = new BlogTemplate
             {
@@ -138,7 +152,9 @@ namespace Mimeo.Tests
         {
             const string template = "{Posts}{PostTitle} {Comments}...{CommentText} {/Comments}{/Posts}";
 
-            var stencil = _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            var stencil = _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
 
             var blog = new BlogTemplate
             {
@@ -165,7 +181,9 @@ namespace Mimeo.Tests
         {
             const string template = "{Posts}{PostTitle} {Comments}...{CommentText} {/Comments}{/Posts}";
 
-            var stencil = _mimeo.CreateStencil("newtemplate", template);
+            var stream = template.ToStream();
+            var stencil = _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
 
             var blog = new BlogTemplate
             {
@@ -193,7 +211,9 @@ namespace Mimeo.Tests
         public void Interpolate_replaces_properly_with_different_parameters()
         {
             _mimeo.Builder.Interpolate("{ContentPage('", ".*", "')}", data => data.ToString());
-            var stencil = _mimeo.CreateStencil("newtemplate", "{ContentPage('asdf')}{ContentPage('qwerty')}");
+            var stream = "{ContentPage('asdf')}{ContentPage('qwerty')}".ToStream();
+            var stencil = _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
             var sb = new StringBuilder();
             stencil.Render(new object(), sb);
             sb.ToString().ShouldEqual("asdfqwerty");
@@ -203,7 +223,9 @@ namespace Mimeo.Tests
         public void Interpolate_replaces_with_simple_negative()
         {
             _mimeo.Builder.Interpolate("{ContentPage('", ".*", "')}", data => data.ToString());
-            _mimeo.CreateStencil("newtemplate", "{BlogTitle} {ContentPage('asdf')} {ContentPage('qwerty')}");
+            var stream = "{BlogTitle} {ContentPage('asdf')} {ContentPage('qwerty')}".ToStream();
+            _mimeo.CreateStencil("newtemplate", stream);
+            stream.Dispose();
             var result = _mimeo.Render("newtemplate", new BlogTemplate { BlogTitle = "My Blog" });
             result.ShouldEqual("My Blog asdf qwerty");
         }

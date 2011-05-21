@@ -10,8 +10,13 @@ namespace Mimeo.Design.Syntax
     /// The root of building a token graph, used in parsing and rendering.
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
-    public interface ITokenRoot<TModel> : ITokenSyntax
+    public interface ITokenRoot<TModel>
     {
+        /// <summary>
+        /// Gets the current token
+        /// </summary>
+        IToken Token { get; }
+
         /// <summary>
         /// Describes a token which contains an argument to be extracted at render time.
         /// </summary>
@@ -86,7 +91,7 @@ namespace Mimeo.Design.Syntax
     /// A token which represents a single simple replacement.
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
-    public interface ISimpleToken<TModel> : ITokenSyntax
+    public interface ISimpleToken<TModel>
     {
         /// <summary>
         /// Feature not implemented yet. Has no affect on returned value.
@@ -111,7 +116,7 @@ namespace Mimeo.Design.Syntax
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TChild"></typeparam>
-    public interface ITokenBlock<TModel, TChild> : ITokenSyntax
+    public interface ITokenBlock<TModel, TChild>
     {
         /// <summary>
         /// Completes the block by defining a terminating identifier.

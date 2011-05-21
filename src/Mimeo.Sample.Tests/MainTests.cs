@@ -88,6 +88,7 @@ namespace Mimeo.Sample.Tests
                 b.Tokenize(p => p.BlogTitle, "{BlogTitle}");
                 b.Tokenize(p => p.PageTitle, "{PageTitle}");
                 b.Tokenize(p => p.JavaScriptIncludes, "{JavaScriptIncludes}");
+                b.Interpolate("{ContentPage('", ".*", "')}", data => data.ToString());
                 b.TokenizeIf(p => p.Post, "{Post}", p => p.Post != null, block => {
                     block.Tokenize(p => p.PostTitle, "{PostTitle}");
                     block.Tokenize(p => p.PostDescription, "{PostDescription}");
@@ -122,9 +123,8 @@ namespace Mimeo.Sample.Tests
             foreach(var test in TestSets)
             {
                 var blogTemplate = test.Data.Deserialize<BlogTemplate>();
-                var template = (new StreamReader(test.Template.OpenRead())).ReadToEnd();
-
-                _mimeographs.CreateStencil<BlogTemplate>(test.Name, template);
+                
+                _mimeographs.CreateStencil<BlogTemplate>(test.Name, test.Template.OpenRead());
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();

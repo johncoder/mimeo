@@ -49,9 +49,10 @@ namespace Mimeo.Tests
         public void ManualInputParser_Parse_should_return_single_simple_negative_space()
         {
             IInputParser inputParser = new ManualInputParser();
+            var stream = "{PageTitle}".ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
-            var stencil = inputParser.Parse(_builder.Token, "{PageTitle}");
-            
             stencil.Count().ShouldEqual(1);
         }
 
@@ -59,7 +60,9 @@ namespace Mimeo.Tests
         public void ManualInputParser_Parse_should_return_single_positive_space()
         {
             IInputParser inputParser = new ManualInputParser();
-            var stencil = inputParser.Parse(_builder.Token, "asdf");
+            var stream = "asdf".ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
             stencil.Count().ShouldEqual(1);
             stencil.Single().ShouldBeType<Positive>();
         }
@@ -71,7 +74,9 @@ namespace Mimeo.Tests
 
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(3);
             stencil.ElementAt(0).ShouldBeType<Positive>();
@@ -86,7 +91,9 @@ namespace Mimeo.Tests
 
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(3);
             stencil.ElementAt(0).ShouldBeType<SimpleNegative>();
@@ -100,7 +107,9 @@ namespace Mimeo.Tests
             const string template = @"{Post}......{/Post}";
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(1);
             stencil.Single().ShouldBeType<ComplexNegative<BlogTemplate, BlogPost>>();
@@ -114,7 +123,9 @@ namespace Mimeo.Tests
             const string template = @"{Post}......{/Post}{Post}......{/Post}";
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(2);
             stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Count().ShouldEqual(2);
@@ -130,7 +141,9 @@ namespace Mimeo.Tests
             const string template = @"{Post}......{/Post}positive{Post}......{/Post}";
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(3);
             stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Count().ShouldEqual(2);
@@ -154,7 +167,9 @@ namespace Mimeo.Tests
             const string template = @"{Post}{PostTitle}{/Post}";
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(1);
             var cn = stencil.ElementAt(0) as ComplexNegative<BlogTemplate, BlogPost>;
@@ -170,7 +185,9 @@ namespace Mimeo.Tests
             const string template = @"{Post}{Comments}...{/Comments}{/Post}";
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(1);
             stencil.OfType<ComplexNegative<BlogTemplate, BlogPost>>().Single().Spaces.Count().ShouldEqual(1);
@@ -186,7 +203,9 @@ namespace Mimeo.Tests
             const string template = @"....{Post}{Comments}...{/Comments}{/Post}....";
             IInputParser inputParser = new ManualInputParser();
 
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(3);
             var element0 = stencil.ElementAt(0) as Positive;
@@ -214,7 +233,10 @@ namespace Mimeo.Tests
         {
             const string template = "{Posts}.{Post.Title}.{/Posts}";
             IInputParser inputParser = new ManualInputParser();
-            var stencil = inputParser.Parse(_builder.Token, template);
+
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(1);
             var complexNeg = stencil.Single() as ComplexNegative<BlogTemplate, BlogPost>;
@@ -226,7 +248,9 @@ namespace Mimeo.Tests
         {
             const string template = "{Posts}...{Post.Title}...{/Posts}";
             IInputParser inputParser = new ManualInputParser();
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(1);
             var complexNeg = stencil.Single() as ComplexNegative<BlogTemplate, BlogPost>;
@@ -238,32 +262,15 @@ namespace Mimeo.Tests
         {
             const string template = "{Posts}...{Post.Title}...{/Posts}{Posts}...{Post.Title}...{/Posts}";
             IInputParser inputParser = new ManualInputParser();
-            var stencil = inputParser.Parse(_builder.Token, template);
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
 
             stencil.Count().ShouldEqual(2);
             var complexNeg0 = stencil.ElementAt(0) as ComplexNegative<BlogTemplate, BlogPost>;
             complexNeg0.Spaces.Count().ShouldEqual(3);
             var complexNeg1 = stencil.ElementAt(1) as ComplexNegative<BlogTemplate, BlogPost>;
             complexNeg1.Spaces.Count().ShouldEqual(3);
-        }
-
-        [Test]
-        public void ManualInputParser_CurrentIsToken_InterpolationData_parses_correctly()
-        {
-            const string template = "{ContentPage('asdf')}";
-            var interpolationData = new InterpolationData
-                {
-                    Start = "{ContentPage('",
-                    End = "')}",
-                    ArgumentPattern = ".*"
-                };
-
-            var parser = new ManualInputParser();
-            parser.Template = template;
-
-            var result = parser.CurrentIsToken(interpolationData);
-            interpolationData.ArgumentInput.ShouldEqual("asdf");
-            result.ShouldBeTrue();
         }
     }
 }
