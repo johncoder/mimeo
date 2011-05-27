@@ -42,6 +42,19 @@ namespace Mimeo.Tests
             _builder.Token.Children.Count().ShouldEqual(3);
         }
 
+        //[Test]
+        //public void Builder_can_be_created_with_little_extra_markup()
+        //{
+        //    /*
+             
+        //     var blah = Token.Create<BlogPost>(new [] {
+        //        { Replacement = b => b.BlogTitle, Identifier = @"" },
+        //        { Children = b => b.Posts, { { Replacement
+        //     });
+             
+        //    */
+        //}
+
         [Test]
         public void Calling_tokenize_should_add_one_child_token()
         {

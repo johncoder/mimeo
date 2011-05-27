@@ -37,6 +37,16 @@ namespace Mimeo
         /// <param name="template"></param>
         /// <returns></returns>
         public abstract IStencil CreateStencil(string name, string template);
+
+        /// <summary>
+        /// A dictionary of stencils that have been previously created.
+        /// </summary>
+        public IDictionary<string, IStencil> Stencils { get; set; }
+
+        protected Mimeograph()
+        {
+            Stencils = new Dictionary<string, IStencil>();
+        }
     }
 
     /// <summary>
@@ -45,8 +55,6 @@ namespace Mimeo
     /// <typeparam name="TModel"></typeparam>
     public class Mimeograph<TModel> : Mimeograph, IMimeograph<TModel>
     {
-        private IDictionary<string, IStencil> Stencils { get; set; }
-
         /// <summary>
         /// The token builder used to manage template parsing and rendering.
         /// </summary>
@@ -75,7 +83,6 @@ namespace Mimeo
         /// <param name="parser"></param>
         public Mimeograph(Action<ITokenRoot<TModel>> configureBuilder, IInputParser parser)
         {
-            Stencils = new Dictionary<string, IStencil>();
             Parser = parser;
             Builder = new TokenBuilder<TModel>();
 

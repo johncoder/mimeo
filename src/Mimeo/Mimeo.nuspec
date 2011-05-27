@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Mimeo</id>
-    <version>1.0.0.0</version>
+    <version>1.0.0.1</version>
     <authors>John Nelson</authors>
     <language>en-US</language>
     <description>A templating library for creating your own templating language, and binding a CLR object to that template.</description>
