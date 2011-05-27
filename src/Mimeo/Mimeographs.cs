@@ -26,9 +26,9 @@ namespace Mimeo
         /// <param name="name"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public string Render(string name, object model)
+        public string Render<TModel>(string name, TModel model)
         {
-            return this[model.GetType()].Render(name, model);
+            return this[typeof(TModel)].Render(name, model);
         }
 
         /// <summary>
