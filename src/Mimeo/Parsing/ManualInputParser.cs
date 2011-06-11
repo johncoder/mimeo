@@ -177,6 +177,10 @@ namespace Mimeo.Parsing
 
             if (token == null)
                 return;
+
+            if (_prospectiveTokens == null)
+                _prospectiveTokens = new List<IToken>();
+
             _prospectiveTokens.Clear();
             _prospectiveTokens.AddRange(token.Children);
         }

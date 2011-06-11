@@ -2,9 +2,10 @@
 <package>
   <metadata>
     <id>Mimeo</id>
-    <version>1.0.0.2</version>
+    <version>1.0.0.4</version>
     <authors>John Nelson</authors>
     <language>en-US</language>
+    <iconUrl>http://farm3.static.flickr.com/2046/5819388403_0f4cab4522_t.jpg</iconUrl>
     <description>A templating library for creating your own templating language, and binding a CLR object to that template.</description>
   </metadata>
   <files>
