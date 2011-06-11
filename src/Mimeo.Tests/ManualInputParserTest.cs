@@ -18,6 +18,8 @@ namespace Mimeo.Tests
         public void SetUp()
         {
             _builder = new TokenBuilder<BlogTemplate>();
+            _builder.Interpolate("{Content('", ".*", "')}", data => data.ToString());
+            _builder.Interpolate("{Url('", @"(?<controller>.*)/(?<action>.*)(/(?<id>\d*)){0,1}", "')}", data => data.ToString());
             _builder.Tokenize(b => b.BlogTitle, @"{PageTitle}");
             _builder.Tokenize(b => b.JavaScriptIncludes, @"{JavaScriptIncludes}");
             _builder.TokenizeIf(b => b.Post, @"{Post}", b => b.Post != null, ctx => {
@@ -271,6 +273,18 @@ namespace Mimeo.Tests
             complexNeg0.Spaces.Count().ShouldEqual(3);
             var complexNeg1 = stencil.ElementAt(1) as ComplexNegative<BlogTemplate, BlogPost>;
             complexNeg1.Spaces.Count().ShouldEqual(3);
+        }
+
+        [Test]
+        public void ManualInputParser_Parse_can_handle_two_interpolating_tokens()
+        {
+            const string template = "asdf{Url('hi/world/again')} but there is more jibberish to be written.";
+            IInputParser inputParser = new ManualInputParser();
+            var stream = template.ToStream();
+            var stencil = inputParser.Parse(_builder.Token, stream);
+            stream.Dispose();
+
+            stencil.Count().ShouldEqual(3);
         }
     }
 }

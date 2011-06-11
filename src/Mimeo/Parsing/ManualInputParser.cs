@@ -147,7 +147,7 @@ namespace Mimeo.Parsing
             return new Result { Type = TokenType.NotAToken };
         }
 
-        private Match CheckForInterpolation(InterpolationData interpolation, string bufferContents)
+        private static Match CheckForInterpolation(InterpolationData interpolation, string bufferContents)
         {
             if (interpolation == null)
                 return null;
@@ -155,7 +155,13 @@ namespace Mimeo.Parsing
             if (!bufferContents.EndsWith(interpolation.End))
                 return null;
 
-            var index = bufferContents.IndexOf(interpolation.Start) + interpolation.Start.Length;
+            var startPosition = bufferContents.IndexOf(interpolation.Start);
+
+            if (startPosition < 0)
+                return null;
+
+            var index = startPosition + interpolation.Start.Length;
+
             var length = bufferContents.IndexOf(interpolation.End);
 
             var input = bufferContents.Substring(index, length - index);
