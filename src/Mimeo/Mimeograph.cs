@@ -77,16 +77,34 @@ namespace Mimeo
         public Mimeograph(Action<ITokenRoot<TModel>> configureBuilder) : this(configureBuilder, new ManualInputParser()) { }
 
         /// <summary>
+        /// Initializes the mimeograph. The token builder should be preconfigured. Uses ManualInputParser.
+        /// </summary>
+        /// <param name="tokenBuilder"></param>
+        public Mimeograph(TokenBuilder<TModel> tokenBuilder) : this(tokenBuilder, new ManualInputParser()) { }
+
+        /// <summary>
         /// Initializes the mimeograph.
         /// </summary>
         /// <param name="configureBuilder"></param>
         /// <param name="parser"></param>
-        public Mimeograph(Action<ITokenRoot<TModel>> configureBuilder, IInputParser parser)
+        public Mimeograph(Action<ITokenRoot<TModel>> configureBuilder, IInputParser parser) : this(new TokenBuilder<TModel>(), parser)
+        {
+            configureBuilder(Builder);
+        }
+
+        /// <summary>
+        /// Initializes mimeograph, providing a token builder that is already configured.
+        /// </summary>
+        /// <param name="tokenBuilder"></param>
+        /// <param name="parser"></param>
+        public Mimeograph(TokenBuilder<TModel> tokenBuilder, IInputParser parser) : this(parser)
+        {
+            Builder = tokenBuilder;
+        }
+
+        private Mimeograph(IInputParser parser)
         {
             Parser = parser;
-            Builder = new TokenBuilder<TModel>();
-
-            configureBuilder(Builder);
         }
 
         /// <summary>

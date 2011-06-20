@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mimeo.Templating.Formatting;
+using System;
 using System.Collections.Generic;
 using Mimeo.Design.Syntax;
 using Mimeo.Internal;
@@ -12,6 +13,7 @@ namespace Mimeo.Design
     public class TokenBuilder<TModel> : ITokenRoot<TModel>, ISimpleToken<TModel>
     {
         private Token<TModel> _currentToken;
+        private FormatterSet _formatterSet = new FormatterSet{ {typeof(object), new DelegateFormatter<object>(o => o.ToString()) } };
 
         /// <summary>
         /// The root token.
@@ -32,6 +34,17 @@ namespace Mimeo.Design
             Token = token;
             if (token.Resolve == null)
                 token.Resolve = p => string.Empty;
+        }
+
+        /// <summary>
+        /// Provides a chance to add or remove IValueFormatters from this token root.
+        /// </summary>
+        /// <param name="interact"></param>
+        /// <returns></returns>
+        public ITokenRoot<TModel> UseFormatters(Action<FormatterSet> interact)
+        {
+            interact(_formatterSet);
+            return this;
         }
 
         /// <summary>
@@ -84,14 +97,21 @@ namespace Mimeo.Design
         /// <param name="replacement"></param>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier)
+        public ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier)
         {
             Ensure.ArgumentNotNull(replacement, "replacement");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
+            var formatter = _formatterSet.Resolve<TChild>();
+
+            if (formatter == null)
+            {
+                formatter = new DelegateFormatter<TModel>(m => m.ToString());
+            }
+
             _currentToken = new Token<TModel>
             {
-                Resolve = replacement,
+                Resolve = f => formatter.Format(replacement(f)),
                 Identifier = string.Intern(identifier)
             };
             Token.AddChild(_currentToken);

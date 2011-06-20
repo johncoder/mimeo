@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mimeo.Templating.Formatting;
 
 namespace Mimeo.Design.Syntax
 {
@@ -40,7 +41,7 @@ namespace Mimeo.Design.Syntax
         /// <param name="replacement">A function that receives the templated object, and the return value replaces the token identifier.</param>
         /// <param name="identifier">A token to replace.</param>
         /// <returns></returns>
-        ISimpleToken<TModel> Tokenize(Func<TModel, string> replacement, string identifier);
+        ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier);
 
         /// <summary>
         /// Describes a conditional token, to be replaced if and only if the defined condition is satisfied.
@@ -85,6 +86,13 @@ namespace Mimeo.Design.Syntax
         /// <param name="builder">A token root containing tokens to be replaced within this token block.</param>
         /// <returns></returns>
         ITokenBlock<TModel, TChild> Block<TChild>(Func<TModel, IEnumerable<TChild>> children, string identifier, ITokenRoot<TChild> builder);
+
+        /// <summary>
+        /// Overrides the base set of value formatters
+        /// </summary>
+        /// <param name="formatterSet"></param>
+        /// <returns></returns>
+        ITokenRoot<TModel> UseFormatters(Action<FormatterSet> interact);
     }
 
     /// <summary>

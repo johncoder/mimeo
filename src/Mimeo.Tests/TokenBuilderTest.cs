@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Mimeo.Design.Syntax;
 using NUnit.Framework;

@@ -5,6 +5,7 @@ namespace Mimeo.Tests
 {
     class BlogTemplate
     {
+        public int Id { get; set; }
         public string PageTitle { get; set; }
         public string BlogTitle { get; set; }
         public BlogPost Post { get; set; }

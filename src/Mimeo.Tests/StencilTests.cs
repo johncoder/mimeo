@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using Should;
+using Mimeo.Design;
+using Mimeo.Templating.Formatting;
 
 namespace Mimeo.Tests
 {
@@ -228,6 +231,101 @@ namespace Mimeo.Tests
             stream.Dispose();
             var result = _mimeo.Render("newtemplate", new BlogTemplate { BlogTitle = "My Blog" });
             result.ShouldEqual("My Blog asdf qwerty");
+        }
+
+        [Test]
+        public void TokenBuilder_with_value_formatters_uses_value_formatters()
+        {
+            var mimeograph = new Mimeographs();
+            var builder = new BlogTemplateTokenBuilder();
+            builder.Configure();
+            mimeograph.Add(new Mimeograph<BlogTemplate>(builder));
+
+            const string template = "{BlogTitle}";
+            mimeograph.CreateStencil<BlogTemplate>("blah", template);
+            var result = mimeograph.Render("blah", new BlogTemplate { BlogTitle = "Hi" });
+
+            result.ShouldEqual("HI");
+        }
+
+        [Test]
+        public void TokenBuilder_with_value_formatter_for_int_uses_value_formatter()
+        {
+            var mimeograph = new Mimeographs();
+            var builder = new BlogTemplateTokenBuilder();
+            builder.Configure();
+            mimeograph.Add(new Mimeograph<BlogTemplate>(builder));
+            mimeograph.CreateStencil<BlogTemplate>("blah", "{Id}");
+            var result = mimeograph.Render("blah", new BlogTemplate { Id = 3 });
+            result.ShouldEqual("3");
+        }
+
+        [Test]
+        public void TokenBuilder_uses_value_formatters_properly()
+        {
+            var mimeograph = new Mimeographs();
+            var builder = new BlogTemplateTokenBuilder();
+            builder.Configure();
+            mimeograph.Add(new Mimeograph<BlogTemplate>(builder));
+            mimeograph.CreateStencil<BlogTemplate>("blah", "{Id}....{BlogTitle}");
+            var result = mimeograph.Render("blah", new BlogTemplate { Id = 3, BlogTitle = "hi" });
+            result.ShouldEqual("3....HI");
+        }
+
+        [Test]
+        public void TokenBuilder_uses_value_formatters_properly_and_not_on_regular_text_in_template()
+        {
+            var mimeograph = new Mimeographs();
+            var builder = new BlogTemplateTokenBuilder();
+            builder.Configure();
+            mimeograph.Add(new Mimeograph<BlogTemplate>(builder));
+            mimeograph.CreateStencil<BlogTemplate>("blah", "{Id}....{BlogTitle}asdf");
+            var result = mimeograph.Render("blah", new BlogTemplate { Id = 3, BlogTitle = "hi" });
+            result.ShouldEqual("3....HIasdf");
+        }
+
+        private class BlogTemplateTokenBuilder : TokenBuilder<BlogTemplate>
+        {
+            public void Configure()
+            {
+                UseFormatters(set =>
+                {
+                    set.Add<string>(s => s.ToUpper());
+                    set.Add<int, ObjectFormatter>();
+                    set.Add<object, ObjectFormatter>();
+                });
+
+                Tokenize(p => p.BlogTitle, "{BlogTitle}");
+                Tokenize(p => p.PageTitle, "{PageTitle}");
+                Tokenize(p => p.JavaScriptIncludes, "{JavaScriptIncludes}");
+                Tokenize(p => p.Id, "{Id}");
+                TokenizeIf(p => p.Post, "{Post}", p => p.Post != null, block =>
+                {
+                    block.Tokenize(p => p.PostTitle, "{PostTitle}");
+                    block.Tokenize(p => p.PostDescription, "{PostDescription}");
+                    block.Tokenize(p => p.PostBody, "{PostBody}");
+                }).EndsWith("{/Post}");
+                Block(p => p.Posts, "{Posts}", block =>
+                {
+                    block.Tokenize(p => p.PostTitle, "{PostTitle}");
+                    block.Tokenize(p => p.PostDescription, "{PostDescription}");
+                    block.Tokenize(p => p.PostBody, "{PostBody}");
+                    block.Block(p => p.Comments, "{Comments}", comments =>
+                    {
+                        comments.Tokenize(c => c.Author, "{Author}");
+                        comments.Tokenize(c => c.Email, "{Email}");
+                        comments.Tokenize(c => c.Text, "{CommentText}");
+                    }).EndsWith("{/Comments}");
+                }).EndsWith("{/Posts}");
+            }
+
+            public class ObjectFormatter : IValueFormatter
+            {
+                public string Format(object value)
+                {
+                    return value.ToString();
+                }
+            }
         }
     }
 }
