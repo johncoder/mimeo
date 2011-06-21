@@ -97,16 +97,22 @@ namespace Mimeo.Design
         /// <param name="replacement"></param>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier)
+        public ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Action<SkipFormatterSet> skip = null)
         {
             Ensure.ArgumentNotNull(replacement, "replacement");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
-            var formatter = _formatterSet.Resolve<TChild>();
+            var skipFormatters = new SkipFormatterSet();
+            if (skip != null)
+            {
+                skip(skipFormatters);
+            }
+
+            var formatter = _formatterSet.Resolve<TChild>(skipFormatters);
 
             if (formatter == null)
             {
-                formatter = new DelegateFormatter<TModel>(m => m.ToString());
+                formatter = new DelegateFormatter<TChild>(m => m.ToString());
             }
 
             _currentToken = new Token<TModel>
@@ -261,19 +267,6 @@ namespace Mimeo.Design
             Token.Children.Add(_currentToken);
 
             return new TokenBlockBuilder<TModel, TChild>(_currentToken);
-        }
-
-        /// <summary>
-        /// Not implemented yet. Has no affect on output.
-        /// </summary>
-        /// <param name="shouldEncode"></param>
-        /// <returns></returns>
-        public ISimpleToken<TModel> Encode(bool shouldEncode)
-        {
-            // come back to this to add filters
-            // consider adding filters collection to Token
-            // and during GetValue, run the result through the collection of filters
-            return this;
         }
     }
 }

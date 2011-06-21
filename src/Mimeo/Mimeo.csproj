@@ -61,6 +61,7 @@
     <Compile Include="Templating\Formatting\DelegateFormatter.cs" />
     <Compile Include="Templating\Formatting\FormatterSet.cs" />
     <Compile Include="Templating\Formatting\IValueFormatter.cs" />
+    <Compile Include="Templating\Formatting\SkipFormatterSet.cs" />
     <Compile Include="Templating\InterpolatingSpace.cs" />
     <Compile Include="Templating\IStencil.cs" />
     <Compile Include="Templating\Positive.cs" />

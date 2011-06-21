@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Mimeo.Templating.Formatting
 {
@@ -26,20 +27,30 @@ namespace Mimeo.Templating.Formatting
             Add(typeof(TModel), new TFormatter());
         }
 
-        public IValueFormatter Resolve<TModel>()
+        public IValueFormatter Resolve<TModel>(SkipFormatterSet skip = null)
         {
-            return Resolve(typeof(TModel));
+            return Resolve(typeof(TModel), skip);
         }
 
-        public IValueFormatter Resolve(Type type)
+        public IValueFormatter Resolve(Type type, SkipFormatterSet skip = null)
         {
             if (ContainsKey(type))
+            {
+                if (skip != null && skip.Any() && skip.Contains(type))
+                    return null;
+
                 return this[type];
+            }
 
             foreach (var pair in this)
             {
                 if (pair.Key.IsAssignableFrom(type))
+                {
+                    if (skip != null && skip.Any() && skip.Contains(pair.Key))
+                        continue;
+
                     return pair.Value;
+                }
             }
 
             return null;

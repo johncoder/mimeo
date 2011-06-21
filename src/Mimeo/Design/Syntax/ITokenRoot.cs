@@ -40,8 +40,9 @@ namespace Mimeo.Design.Syntax
         /// </summary>
         /// <param name="replacement">A function that receives the templated object, and the return value replaces the token identifier.</param>
         /// <param name="identifier">A token to replace.</param>
+        /// <param name="skip">[OPTIONAL] A callback for configuring what formatters should be skipped for this token.</param>
         /// <returns></returns>
-        ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier);
+        ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Action<SkipFormatterSet> skip = null);
 
         /// <summary>
         /// Describes a conditional token, to be replaced if and only if the defined condition is satisfied.
@@ -101,12 +102,7 @@ namespace Mimeo.Design.Syntax
     /// <typeparam name="TModel"></typeparam>
     public interface ISimpleToken<TModel>
     {
-        /// <summary>
-        /// Feature not implemented yet. Has no affect on returned value.
-        /// </summary>
-        /// <param name="shouldEncode"></param>
-        /// <returns></returns>
-        ISimpleToken<TModel> Encode(bool shouldEncode);
+
     }
 
     /// <summary>

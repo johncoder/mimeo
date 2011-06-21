@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Should;
 using Mimeo.Design;
 using Mimeo.Templating.Formatting;
+using System.Linq;
 
 namespace Mimeo.Tests
 {
@@ -284,6 +285,18 @@ namespace Mimeo.Tests
             result.ShouldEqual("3....HIasdf");
         }
 
+        [Test]
+        public void TokenBuilder_does_not_use_skipped_formatters()
+        {
+            var mimeograph = new Mimeographs();
+            var builder = new BlogTemplateTokenBuilder();
+            builder.Configure();
+            mimeograph.Add(new Mimeograph<BlogTemplate>(builder));
+            mimeograph.CreateStencil<BlogTemplate>("blah", "{Id}....{SecondBlogTitle} asdf");
+            var result = mimeograph.Render("blah", new BlogTemplate { Id = 3, BlogTitle = "hi" });
+            result.ShouldEqual("3....hi asdf");
+        }
+
         private class BlogTemplateTokenBuilder : TokenBuilder<BlogTemplate>
         {
             public void Configure()
@@ -295,6 +308,10 @@ namespace Mimeo.Tests
                     set.Add<object, ObjectFormatter>();
                 });
 
+                Tokenize(bp => bp.BlogTitle, "{SecondBlogTitle}", set =>
+                {
+                    set.SkipFormatter<string>();
+                }); 
                 Tokenize(p => p.BlogTitle, "{BlogTitle}");
                 Tokenize(p => p.PageTitle, "{PageTitle}");
                 Tokenize(p => p.JavaScriptIncludes, "{JavaScriptIncludes}");

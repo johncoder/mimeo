@@ -29,7 +29,7 @@ namespace Mimeo.Tests
             _builder.Block(b => b.Posts, @"{Posts}", postContext => {
                     postContext.Tokenize(d => d.PostTitle, @"{Post.Title}");
                     postContext.Tokenize(d => d.PostDescription, @"{Post.Description}");
-                    postContext.Tokenize(d => d.PostBody, @"{Post.Body}").Encode(false);
+                    postContext.Tokenize(d => d.PostBody, @"{Post.Body}");
                     postContext.Tokenize(d => d.PostedOn.ToShortDateString(), @"{Post.Date}");
                     postContext.Block(d => d.Comments, @"{Comments}", commentContext => {
                             commentContext.Tokenize(c => c.Email, @"{Comment.Email}");
