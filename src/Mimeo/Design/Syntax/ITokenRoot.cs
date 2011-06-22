@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mimeo.Design.Tokens;
 using Mimeo.Templating.Formatting;
 
 namespace Mimeo.Design.Syntax
@@ -26,14 +27,14 @@ namespace Mimeo.Design.Syntax
         /// <param name="end">The ending characters of the token, starting after the argument pattern.</param>
         /// <param name="inject">The extracted argument is passed to this delegate.</param>
         /// <returns></returns>
-        ISimpleToken<TModel> Interpolate(string start, string argumentPattern, string end, Func<dynamic, string> inject);
+        ISimpleToken Interpolate(string start, string argumentPattern, string end, Func<dynamic, string> inject);
 
         /// <summary>
         /// Describes a token which contains an argument to be extracted at render time.
         /// </summary>
         /// <param name="interpolationData">An object containing all interpolation data.</param>
         /// <returns></returns>
-        ISimpleToken<TModel> Interpolate(InterpolationData interpolationData);
+        ISimpleToken Interpolate(InterpolationData interpolationData);
 
         /// <summary>
         /// Describes a simple property to token replacement.
@@ -42,7 +43,7 @@ namespace Mimeo.Design.Syntax
         /// <param name="identifier">A token to replace.</param>
         /// <param name="skip">[OPTIONAL] A callback for configuring what formatters should be skipped for this token.</param>
         /// <returns></returns>
-        ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Action<SkipFormatterSet> skip = null);
+        ISimpleToken Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Action<OverrideFormatterSet> skip = null);
 
         /// <summary>
         /// Describes a conditional token, to be replaced if and only if the defined condition is satisfied.
@@ -91,7 +92,7 @@ namespace Mimeo.Design.Syntax
         /// <summary>
         /// Overrides the base set of value formatters
         /// </summary>
-        /// <param name="formatterSet"></param>
+        /// <param name="interact"></param>
         /// <returns></returns>
         ITokenRoot<TModel> UseFormatters(Action<FormatterSet> interact);
     }
@@ -99,21 +100,14 @@ namespace Mimeo.Design.Syntax
     /// <summary>
     /// A token which represents a single simple replacement.
     /// </summary>
-    /// <typeparam name="TModel"></typeparam>
-    public interface ISimpleToken<TModel>
-    {
-
-    }
+    public interface ISimpleToken { }
 
     /// <summary>
     /// A token that is replaced only by satisfying a condition.
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
     /// <typeparam name="TChild"></typeparam>
-    public interface IConditionalToken<TModel, TChild> : ITokenBlock<TModel, TChild>
-    {
-        
-    }
+    public interface IConditionalToken<TModel, TChild> : ITokenBlock<TModel, TChild> { }
 
     /// <summary>
     /// The end of a token that represents a token block.

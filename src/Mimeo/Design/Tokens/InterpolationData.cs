@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Mimeo.Design
+namespace Mimeo.Design.Tokens
 {
     /// <summary>
     /// Represents data that will be interpolated at render time.
@@ -35,7 +35,7 @@ namespace Mimeo.Design
         /// A function that performs an action based on the values extracted from the token.
         /// </summary>
         /// <remarks>Any captured named groups will appear as properties on the dynamic parameter.</remarks>
-        public Func<dynamic, string> Injection { get; set; }
+        public Func<object, string> Injection { get; set; }
 
         /// <summary>
         /// The total length of the parsed token.

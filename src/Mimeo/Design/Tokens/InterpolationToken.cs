@@ -1,6 +1,6 @@
 ﻿using Mimeo.Templating;
 
-namespace Mimeo.Design
+namespace Mimeo.Design.Tokens
 {
     /// <summary>
     /// A token whose value is interpolated at render time.
@@ -15,7 +15,7 @@ namespace Mimeo.Design
         public override Space CreateSpace()
         {
             var space = new InterpolatingSpace();
-            space.Initialize(Interpolation.CreateValueDelegate<dynamic>());
+            space.Initialize(Interpolation.CreateValueDelegate<object>());
 
             return space;
         }

@@ -1,5 +1,6 @@
 using System.IO;
 using Mimeo.Design;
+using Mimeo.Design.Tokens;
 using Mimeo.Templating;
 
 namespace Mimeo.Parsing

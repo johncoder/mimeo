@@ -28,28 +28,48 @@ namespace Mimeo
         /// <returns></returns>
         public string Render<TModel>(string name, TModel model)
         {
-            return this[typeof(TModel)].Render(name, model);
+            var modelType = typeof (TModel);
+
+            var mimeograph = FindMimeograph(modelType);
+            return mimeograph.Render(name, model);
+        }
+
+        private Mimeograph FindMimeograph(Type modelType)
+        {
+            if (ContainsKey(modelType))
+                return this[modelType];
+
+            foreach(var mimeograph in this)
+            {
+                if (mimeograph.Key.IsAssignableFrom(modelType))
+                    return mimeograph.Value;
+            }
+
+            throw new KeyNotFoundException(string.Format("A mimeograph for type [{0}] has not been registered.", modelType.AssemblyQualifiedName));
         }
 
         /// <summary>
-        /// Creates a stencil for an object type using a name.
+        /// Creates a stencil for the given type.
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <param name="name"></param>
         /// <param name="template"></param>
-        //public void CreateStencil<TModel>(string name, string template)
-        //{
-        //    this[typeof(TModel)].CreateStencil(name, template);
-        //}
-
         public void CreateStencil<TModel>(string name, string template)
         {
             CreateStencil<TModel>(name, new MemoryStream(Encoding.UTF8.GetBytes(template)));
         }
 
+        /// <summary>
+        /// Creates a stencil for the given type.
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="template"></param>
         public void CreateStencil<TModel>(string name, Stream template)
         {
-            this[typeof (TModel)].CreateStencil(name, template);
+            var mimeograph = FindMimeograph(typeof(TModel));
+
+            mimeograph.CreateStencil(name, template);
         }
     }
 }

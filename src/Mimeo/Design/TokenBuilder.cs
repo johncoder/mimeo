@@ -1,4 +1,5 @@
-﻿using Mimeo.Templating.Formatting;
+﻿using Mimeo.Design.Tokens;
+using Mimeo.Templating.Formatting;
 using System;
 using System.Collections.Generic;
 using Mimeo.Design.Syntax;
@@ -10,10 +11,10 @@ namespace Mimeo.Design
     /// An object that builds tokens.
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
-    public class TokenBuilder<TModel> : ITokenRoot<TModel>, ISimpleToken<TModel>
+    public class TokenBuilder<TModel> : ITokenRoot<TModel>, ISimpleToken
     {
         private Token<TModel> _currentToken;
-        private FormatterSet _formatterSet = new FormatterSet{ {typeof(object), new DelegateFormatter<object>(o => o.ToString()) } };
+        private readonly FormatterSet _formatterSet = new FormatterSet{ {typeof(object), new DelegateFormatter<object>(o => o.ToString()) } };
 
         /// <summary>
         /// The root token.
@@ -55,7 +56,7 @@ namespace Mimeo.Design
         /// <param name="end"></param>
         /// <param name="inject"></param>
         /// <returns></returns>
-        public ISimpleToken<TModel> Interpolate(string start, string argumentPattern, string end, Func<dynamic, string> inject)
+        public ISimpleToken Interpolate(string start, string argumentPattern, string end, Func<dynamic, string> inject)
         {
             Ensure.ArgumentNotNullOrEmpty(start, "start");
             Ensure.ArgumentNotNullOrEmpty(end, "end");
@@ -77,11 +78,11 @@ namespace Mimeo.Design
         /// </summary>
         /// <param name="interpolationData"></param>
         /// <returns></returns>
-        public ISimpleToken<TModel> Interpolate(InterpolationData interpolationData)
+        public ISimpleToken Interpolate(InterpolationData interpolationData)
         {
             Ensure.ArgumentNotNull(interpolationData, "interpolationData");
 
-            _currentToken = new InterpolationToken<TModel>()
+            _currentToken = new InterpolationToken<TModel>
             {
                 Interpolation = interpolationData,
                 Identifier = interpolationData.GetIdentifier()
@@ -96,24 +97,20 @@ namespace Mimeo.Design
         /// </summary>
         /// <param name="replacement"></param>
         /// <param name="identifier"></param>
+        /// <param name="specifyFormatters"></param>
         /// <returns></returns>
-        public ISimpleToken<TModel> Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Action<SkipFormatterSet> skip = null)
+        public ISimpleToken Tokenize<TChild>(Func<TModel, TChild> replacement, string identifier, Action<OverrideFormatterSet> specifyFormatters = null)
         {
             Ensure.ArgumentNotNull(replacement, "replacement");
             Ensure.ArgumentNotNullOrEmpty(identifier, "identifier");
 
-            var skipFormatters = new SkipFormatterSet();
-            if (skip != null)
+            var formatters = new OverrideFormatterSet();
+            if (specifyFormatters != null)
             {
-                skip(skipFormatters);
+                specifyFormatters(formatters);
             }
 
-            var formatter = _formatterSet.Resolve<TChild>(skipFormatters);
-
-            if (formatter == null)
-            {
-                formatter = new DelegateFormatter<TChild>(m => m.ToString());
-            }
+            var formatter = GetValueFormatter<TChild>(formatters);
 
             _currentToken = new Token<TModel>
             {
@@ -123,6 +120,11 @@ namespace Mimeo.Design
             Token.AddChild(_currentToken);
 
             return this;
+        }
+
+        private IValueFormatter GetValueFormatter<TChild>(OverrideFormatterSet formatters)
+        {
+            return _formatterSet.Resolve<TChild>(formatters) ?? new DelegateFormatter<TChild>(m => m.ToString());
         }
 
         /// <summary>
@@ -235,10 +237,10 @@ namespace Mimeo.Design
             if (items == null)
                 yield break;
 
-            foreach (var child in children(model))
+            foreach (var item in items)
             {
-                if (child != null)
-                    yield return child;
+                if (item != null)
+                    yield return item;
                 else
                     yield break;
             }

@@ -43,6 +43,9 @@ namespace Mimeo
         /// </summary>
         public IDictionary<string, IStencil> Stencils { get; set; }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         protected Mimeograph()
         {
             Stencils = new Dictionary<string, IStencil>();
@@ -118,6 +121,12 @@ namespace Mimeo
             return Render(name, (TModel)obj);
         }
 
+        /// <summary>
+        /// Creates a stencil using a template.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
         public override IStencil CreateStencil(string name, Stream template)
         {
             if (Stencils.ContainsKey(name))
@@ -133,6 +142,12 @@ namespace Mimeo
             return stencil;
         }
 
+        /// <summary>
+        /// Creates a stencil using a string template. ** Larger templates will perform much better if passed as a stream.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
         public override IStencil CreateStencil(string name, string template)
         {
             using (var ms = new MemoryStream(Encoding.Default.GetBytes(template)))

@@ -42,12 +42,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Design\BlockToken.cs" />
-    <Compile Include="Design\InterpolationData.cs" />
-    <Compile Include="Design\InterpolationToken.cs" />
-    <Compile Include="Design\IToken.cs" />
+    <Compile Include="Design\Template.cs" />
+    <Compile Include="Design\Tokens\BlockToken.cs" />
+    <Compile Include="Design\Tokens\InterpolationData.cs" />
+    <Compile Include="Design\Tokens\InterpolationToken.cs" />
+    <Compile Include="Design\Tokens\IToken.cs" />
     <Compile Include="Design\Syntax\ITokenRoot.cs" />
-    <Compile Include="Design\Token.cs" />
+    <Compile Include="Design\Tokens\Token.cs" />
     <Compile Include="Design\TokenBlockBuilder.cs" />
     <Compile Include="Design\TokenBuilder.cs" />
     <Compile Include="IMimeograph.cs" />
@@ -61,7 +62,7 @@
     <Compile Include="Templating\Formatting\DelegateFormatter.cs" />
     <Compile Include="Templating\Formatting\FormatterSet.cs" />
     <Compile Include="Templating\Formatting\IValueFormatter.cs" />
-    <Compile Include="Templating\Formatting\SkipFormatterSet.cs" />
+    <Compile Include="Templating\Formatting\OverrideFormatterSet.cs" />
     <Compile Include="Templating\InterpolatingSpace.cs" />
     <Compile Include="Templating\IStencil.cs" />
     <Compile Include="Templating\Positive.cs" />

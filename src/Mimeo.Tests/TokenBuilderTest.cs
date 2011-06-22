@@ -1,5 +1,6 @@
 using System.Linq;
 using Mimeo.Design.Syntax;
+using Mimeo.Design.Tokens;
 using NUnit.Framework;
 using Mimeo.Design;
 using Should;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Mimeo.Templating;
 
-namespace Mimeo.Design
+namespace Mimeo.Design.Tokens
 {
     /// <summary>
     /// A token which represents a block of tokens.

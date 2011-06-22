@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Mimeo.Internal;
 using Mimeo.Templating;
 
-namespace Mimeo.Design
+namespace Mimeo.Design.Tokens
 {
     /// <summary>
     /// A strongly typed token.

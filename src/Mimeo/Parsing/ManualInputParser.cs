@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Mimeo.Design;
+using Mimeo.Design.Tokens;
 using Mimeo.Templating;
 
 namespace Mimeo.Parsing
@@ -11,7 +12,7 @@ namespace Mimeo.Parsing
     /// <summary>
     /// Manually parses a template to produce a stencil.
     /// </summary>
-    public class ManualInputParser : IInputParser
+    public sealed class ManualInputParser : IInputParser
     {
         private Stream TemplateStream { get; set; }
         private Stack<Result> TokenStack { get; set; }
@@ -27,7 +28,7 @@ namespace Mimeo.Parsing
             return Parse(token);
         }
 
-        protected IStencil Parse(IToken token)
+        private IStencil Parse(IToken token)
         {
             var stencil = new Stencil();
             _currentSpace = stencil;
@@ -185,19 +186,51 @@ namespace Mimeo.Parsing
             _prospectiveTokens.AddRange(token.Children);
         }
         
+        /// <summary>
+        /// The result of parsing a token.
+        /// </summary>
         public class Result
         {
+            /// <summary>
+            /// The type of token that this result represents.
+            /// </summary>
             public TokenType Type { get; set; }
+
+            /// <summary>
+            /// The paylod of string data that represents the token.
+            /// </summary>
             public string Payload { get; set; }
+
+            /// <summary>
+            /// The token matching this result.
+            /// </summary>
             public IToken Token { get; set; }
         }
 
+        /// <summary>
+        /// An enumeration of TokenTypes. This indicates what the parser should do with the current string buffer.
+        /// </summary>
         public enum TokenType
         {
+            /// <summary>
+            /// A simple token that is replaced by a value.
+            /// </summary>
             Simple,
+            /// <summary>
+            /// A complex token that is replaced by a block of content, often consisting of other simple tokens.
+            /// </summary>
             Complex,
+            /// <summary>
+            /// A token whose value is to be interpolated, or derived from external input. This is similar to a simple token.
+            /// </summary>
             Interpolation,
+            /// <summary>
+            /// A result that does not represent a token.
+            /// </summary>
             NotAToken,
+            /// <summary>
+            /// The identifier that signals the end of a complex token.
+            /// </summary>
             Terminator
         }
     }
