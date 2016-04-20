@@ -1,5 +1,5 @@
 # mimeo
-A templating engine in .NET that lets you build your own tempalte syntax.
+A library for .NET that lets you build your own templating syntax.
 
 Example:
 
